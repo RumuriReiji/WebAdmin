@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Quản lý Chuyến xe — Nhà xe Trác Truyệt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <style>
+    /* ═══════════════ DESIGN TOKENS (design_system.md §1-4) ═══════════════ */
+    :root{
+      --clr-primary:#1976D2;--clr-primary-dark:#1565C0;--clr-primary-light:#BBDEFB;
+      --clr-success:#2E7D32;--clr-success-light:#E8F5E9;
+      --clr-warning:#F57C00;--clr-warning-light:#FFF3E0;
+      --clr-danger:#D32F2F;--clr-danger-light:#FFEBEE;
+      --clr-info:#0288D1;--clr-info-light:#E3F2FD;
+      --clr-bg:#F5F5F5;--clr-surface:#FFFFFF;
+      --clr-text:#212121;--clr-text-secondary:#757575;--clr-border:#E0E0E0;
+      --clr-sidebar-bg:#0D47A1;--clr-sidebar-text:#FFFFFF;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.10);--shadow-lg:0 8px 24px rgba(0,0,0,.14);
+      --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-pill:20px;
+      --font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      --sidebar-w:260px;--header-h:56px;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:var(--font-family);font-size:14px;color:var(--clr-text);background:var(--clr-bg);line-height:1.6;margin:0}
+
+    /* ═══════════════ SIDEBAR (§5.2) ═══════════════ */
+    .layout-sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--clr-sidebar-bg);color:var(--clr-sidebar-text);z-index:1040;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto}
+    .layout-sidebar::-webkit-scrollbar{width:4px}.layout-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:4px}
+    .sidebar-brand{height:var(--header-h);display:flex;align-items:center;gap:10px;padding:0 20px;font-size:17px;font-weight:700;letter-spacing:-.3px;border-bottom:1px solid rgba(255,255,255,.12);flex-shrink:0}.sidebar-brand i{font-size:24px}
+    .sidebar-nav{list-style:none;padding:12px 0;margin:0;flex:1}
+    .sidebar-nav-label{padding:16px 20px 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4)}
+    .sidebar-nav-item a{display:flex;align-items:center;gap:12px;padding:10px 20px;color:rgba(255,255,255,.72);text-decoration:none;font-size:14px;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+    .sidebar-nav-item a:hover{background:rgba(255,255,255,.08);color:#fff}
+    .sidebar-nav-item a.is-active{background:rgba(255,255,255,.15);border-left-color:#fff;color:#fff}
+    .sidebar-nav-item a i{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+
+    /* ═══════════════ HEADER (§5.3) ═══════════════ */
+    .layout-header{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--header-h);background:var(--clr-surface);box-shadow:var(--shadow-sm);z-index:1030;display:flex;align-items:center;justify-content:space-between;padding:0 24px;transition:left .3s}
+    .header-left{display:flex;align-items:center;gap:12px}
+    .header-right{display:flex;align-items:center;gap:8px}
+    .header-toggle{display:none;border:none;background:none;font-size:22px;color:var(--clr-text);cursor:pointer;padding:4px;border-radius:var(--radius-sm)}.header-toggle:hover{background:var(--clr-bg)}
+    .header-breadcrumb{font-size:14px;color:var(--clr-text-secondary);display:flex;align-items:center;gap:6px}.header-breadcrumb span{color:var(--clr-text);font-weight:600}
+    .header-search{position:relative;min-width:260px}
+    .header-search input{width:100%;height:36px;padding:0 12px 0 36px;border:1px solid var(--clr-border);border-radius:var(--radius-sm);font-family:var(--font-family);font-size:13px;background:var(--clr-bg);color:var(--clr-text);transition:border-color .15s,box-shadow .15s,background .15s}
+    .header-search input:focus{outline:none;border-color:var(--clr-primary);box-shadow:0 0 0 3px rgba(25,118,210,.15);background:#fff}
+    .header-search input::placeholder{color:var(--clr-text-secondary)}
+    .header-search>i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--clr-text-secondary);font-size:15px;pointer-events:none}
+    .header-icon-btn{position:relative;border:none;background:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--clr-text-secondary);font-size:20px;transition:background .15s,color .15s}
+    .header-icon-btn:hover{background:var(--clr-bg);color:var(--clr-text)}
+    .header-icon-btn .badge-dot{position:absolute;top:6px;right:7px;width:9px;height:9px;background:var(--clr-danger);border-radius:50%;border:2px solid var(--clr-surface)}
+    .header-avatar{width:34px;height:34px;border-radius:50%;background:var(--clr-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;cursor:pointer;margin-left:4px}
+
+    /* ═══════════════ MAIN ═══════════════ */
+    .layout-main{margin-left:var(--sidebar-w);margin-top:var(--header-h);padding:24px;min-height:calc(100vh - var(--header-h));transition:margin-left .3s}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1035;opacity:0;transition:opacity .3s}.sidebar-overlay.is-visible{display:block;opacity:1}
+
+    /* ═══════════════ COMPONENTS (§6) ═══════════════ */
+    /* Buttons */
+    .c-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 18px;font-family:var(--font-family);font-size:14px;font-weight:500;border-radius:var(--radius-sm);border:none;cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap;line-height:1}
+    .c-btn:disabled{opacity:.5;cursor:not-allowed}
+    .c-btn--primary{background:var(--clr-primary);color:#fff}.c-btn--primary:hover:not(:disabled){background:var(--clr-primary-dark)}
+    .c-btn--secondary{background:transparent;color:var(--clr-primary);border:1px solid var(--clr-primary)}.c-btn--secondary:hover:not(:disabled){background:rgba(25,118,210,.06)}
+    .c-btn--success{background:var(--clr-success);color:#fff}.c-btn--success:hover:not(:disabled){background:#256b29}
+    .c-btn--danger{background:var(--clr-danger);color:#fff}.c-btn--danger:hover:not(:disabled){background:#b72626}
+    .c-btn--ghost{background:transparent;color:var(--clr-text)}.c-btn--ghost:hover:not(:disabled){background:rgba(0,0,0,.04)}
+    .c-btn--warning{background:var(--clr-warning);color:#fff}.c-btn--warning:hover:not(:disabled){background:#e06c00}
+    .c-btn--sm{height:30px;padding:0 12px;font-size:13px}
+    .c-btn--icon{width:38px;padding:0}.c-btn--icon.c-btn--sm{width:30px}
+
+    /* Inputs */
+    .c-form-group{margin-bottom:16px}
+    .c-label{display:block;font-size:13px;font-weight:500;margin-bottom:4px;color:var(--clr-text)}.c-label .req{color:var(--clr-danger);margin-left:2px}
+    .c-input{width:100%;height:38px;padding:0 12px;font-family:var(--font-family);font-size:14px;color:var(--clr-text);background:#fff;border:1px solid var(--clr-border);border-radius:var(--radius-sm);transition:border-color .15s,box-shadow .15s}
+    .c-input:focus{outline:none;border-color:var(--clr-primary);box-shadow:0 0 0 3px rgba(25,118,210,.15)}
+    .c-input::placeholder{color:var(--clr-text-secondary)}
+    .c-input[readonly]{background:var(--clr-bg);color:var(--clr-text-secondary);cursor:default}.c-input[readonly]:focus{border-color:var(--clr-border);box-shadow:none}
+    .c-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+
+    /* Table */
+    .c-table-wrapper{background:var(--clr-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);overflow:hidden}
+    .c-table{width:100%;border-collapse:collapse}
+    .c-table thead th{background:#FAFAFA;padding:10px 14px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--clr-text-secondary);text-align:left;border-bottom:1px solid var(--clr-border);white-space:nowrap}
+    .c-table tbody td{padding:10px 14px;font-size:14px;border-bottom:1px solid var(--clr-border);vertical-align:middle}
+    .c-table tbody tr:last-child td{border-bottom:none}
+    .c-table tbody tr{transition:background .1s}.c-table tbody tr:hover{background:rgba(25,118,210,.03)}
+
+    /* Badge */
+    .c-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:500;white-space:nowrap}
+    .c-badge--success{background:var(--clr-success-light);color:var(--clr-success)}
+    .c-badge--warning{background:var(--clr-warning-light);color:var(--clr-warning)}
+    .c-badge--danger{background:var(--clr-danger-light);color:var(--clr-danger)}
+    .c-badge--info{background:var(--clr-info-light);color:var(--clr-info)}
+
+    /* Modal */
+    .c-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1050;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto}
+    .c-modal-overlay.is-open{display:flex;animation:mF .2s}
+    .c-modal{background:var(--clr-surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:600px;display:flex;flex-direction:column;animation:mS .25s}
+    .c-modal--lg{max-width:780px}
+    .c-modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--clr-border)}
+    .c-modal-title{font-size:18px;font-weight:600;margin:0;display:flex;align-items:center;gap:8px}
+    .c-modal-close{border:none;background:none;font-size:22px;color:var(--clr-text-secondary);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:background .15s}.c-modal-close:hover{background:var(--clr-bg);color:var(--clr-text)}
+    .c-modal-body{padding:24px;overflow-y:auto;max-height:calc(90vh - 140px)}
+    .c-modal-body::-webkit-scrollbar{width:5px}.c-modal-body::-webkit-scrollbar-thumb{background:var(--clr-border);border-radius:5px}
+    .c-modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid var(--clr-border)}
+    @keyframes mF{from{opacity:0}to{opacity:1}}
+    @keyframes mS{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ═══════════════ PAGE TABS ═══════════════ */
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .page-title{font-size:24px;font-weight:700;margin:0;display:flex;align-items:center;gap:10px}.page-title i{color:var(--clr-primary)}
+    .page-subtitle{font-size:14px;color:var(--clr-text-secondary);margin:2px 0 0}
+    .c-page-tabs{display:flex;gap:0;border-bottom:2px solid var(--clr-border);margin-bottom:20px;overflow-x:auto}
+    .c-page-tab{position:relative;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-family:var(--font-family);font-size:14px;font-weight:500;color:var(--clr-text-secondary);background:none;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+    .c-page-tab:hover{color:var(--clr-text)}
+    .c-page-tab.is-active{color:var(--clr-primary);border-bottom-color:var(--clr-primary);font-weight:600}
+    .c-page-tab i{font-size:16px}
+    .c-tab-panel{display:none}.c-tab-panel.is-active{display:block;animation:tIn .2s ease}
+    @keyframes tIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Filter bar */
+    .c-filter-bar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+    .c-filter-search{position:relative;flex:1;min-width:200px;max-width:380px}
+    .c-filter-search input{width:100%;height:38px;padding:0 12px 0 38px;font-family:var(--font-family);font-size:14px;color:var(--clr-text);background:#fff;border:1px solid var(--clr-border);border-radius:var(--radius-sm);transition:border-color .15s,box-shadow .15s}
+    .c-filter-search input:focus{outline:none;border-color:var(--clr-primary);box-shadow:0 0 0 3px rgba(25,118,210,.15)}
+    .c-filter-search input::placeholder{color:var(--clr-text-secondary)}
+    .c-filter-search>i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--clr-text-secondary);font-size:15px;pointer-events:none}
+
+    /* Form grid */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+    .form-grid .fw{grid-column:1/-1}
+    @media(max-width:575.98px){.form-grid{grid-template-columns:1fr}}
+
+    /* Modal list (chọn xe / tài xế) */
+    .pick-list{max-height:340px;overflow-y:auto;border:1px solid var(--clr-border);border-radius:var(--radius-sm)}
+    .pick-list::-webkit-scrollbar{width:5px}.pick-list::-webkit-scrollbar-thumb{background:var(--clr-border);border-radius:5px}
+    .pick-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--clr-border);cursor:pointer;transition:background .1s;gap:12px}
+    .pick-item:last-child{border-bottom:none}
+    .pick-item:hover{background:rgba(25,118,210,.04)}
+    .pick-item.is-disabled{opacity:.45;cursor:not-allowed;background:var(--clr-bg)}
+    .pick-main{flex:1;min-width:0}
+    .pick-title{font-weight:600;font-size:14px}
+    .pick-sub{font-size:12px;color:var(--clr-text-secondary);margin-top:2px}
+
+    /* Alert nhỏ trong modal */
+    .c-alert{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px}
+    .c-alert--warning{background:var(--clr-warning-light);color:#e65100}
+    .c-alert--danger{background:var(--clr-danger-light);color:var(--clr-danger)}
+    .c-alert i{font-size:16px;flex-shrink:0;margin-top:1px}
+
+    /* Confirm modal */
+    .confirm-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px}
+    .confirm-icon--danger{background:var(--clr-danger-light);color:var(--clr-danger)}
+    .confirm-text{text-align:center;font-size:15px;margin-bottom:4px}
+    .confirm-sub{text-align:center;font-size:13px;color:var(--clr-text-secondary)}
+
+    /* Empty state */
+    .empty-state{text-align:center;padding:40px 16px!important;color:var(--clr-text-secondary)}.empty-state i{font-size:36px;display:block;margin-bottom:8px;opacity:.3}
+
+    /* Toast */
+    .c-toast{position:fixed;bottom:24px;right:24px;z-index:1100;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:#fff;box-shadow:var(--shadow-lg);transform:translateY(20px);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.4,0,.2,1)}
+    .c-toast.is-visible{transform:translateY(0);opacity:1;pointer-events:auto}
+    .c-toast--success{background:var(--clr-success)}.c-toast--danger{background:var(--clr-danger)}.c-toast--warning{background:var(--clr-warning)}.c-toast--info{background:var(--clr-primary)}
+
+    /* Responsive */
+    @media(max-width:991.98px){.layout-sidebar{transform:translateX(-100%)}.layout-sidebar.is-open{transform:translateX(0)}.layout-header{left:0}.layout-main{margin-left:0}.header-toggle{display:flex}}
+    @media(max-width:575.98px){.header-search{display:none}.layout-main{padding:16px}}
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR — "Chuyến xe" highlighted -->
+  <aside class="layout-sidebar" id="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-bus-front-fill"></i> Nhà xe Trác Truyệt</div>
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-label">Chính</li>
+      <li class="sidebar-nav-item"><a href="../index.html"><i class="bi bi-grid-1x2-fill"></i> Tổng quan</a></li>
+      <li class="sidebar-nav-label">Quản lý</li>
+      <li class="sidebar-nav-item"><a href="nhan-vien.html"><i class="bi bi-people-fill"></i> Nhân viên</a></li>
+      <li class="sidebar-nav-item"><a href="khach-hang.html"><i class="bi bi-person-fill"></i> Khách hàng</a></li>
+      <li class="sidebar-nav-item"><a href="chuyen-xe.html" class="is-active"><i class="bi bi-signpost-split-fill"></i> Chuyến xe</a></li>
+      <li class="sidebar-nav-item"><a href="ve-xe.html"><i class="bi bi-ticket-perforated-fill"></i> Vé xe</a></li>
+      <li class="sidebar-nav-item"><a href="quan-ly-xe.html"><i class="bi bi-truck-front-fill"></i> Xe</a></li>
+      <li class="sidebar-nav-label">Báo cáo</li>
+      <li class="sidebar-nav-item"><a href="doanh-thu.html"><i class="bi bi-graph-up-arrow"></i> Doanh thu</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- HEADER -->
+  <header class="layout-header">
+    <div class="header-left">
+      <button class="header-toggle" id="sidebarToggle" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+      <div class="header-breadcrumb"><i class="bi bi-house-fill" style="color:var(--clr-primary)"></i><span>/</span> Quản lý <span>/</span> <span>Chuyến xe</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-search"><i class="bi bi-search"></i><input type="text" placeholder="Tìm kiếm..."/></div>
+      <button class="header-icon-btn" title="Thông báo"><i class="bi bi-bell-fill"></i><span class="badge-dot"></span></button>
+      <div class="header-avatar" title="Admin">A</div>
+    </div>
+  </header>
+
+  <!-- NỘI DUNG CHÍNH -->
+  <main class="layout-main">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title"><i class="bi bi-signpost-split-fill"></i> Quản lý Chuyến xe</h1>
+        <p class="page-subtitle">Lịch trình, phân công xe & tài xế, điểm đón/trả cho các chuyến xe.</p>
+      </div>
+    </div>
+
+    <!-- 4 TABS -->
+    <div class="c-page-tabs">
+      <button class="c-page-tab is-active" data-tab="panelSchedule"><i class="bi bi-calendar-week-fill"></i> Lịch trình</button>
+      <button class="c-page-tab" data-tab="panelVehicle"><i class="bi bi-truck-front-fill"></i> Phân công xe</button>
+      <button class="c-page-tab" data-tab="panelDriver"><i class="bi bi-person-badge-fill"></i> Phân công tài xế</button>
+      <button class="c-page-tab" data-tab="panelStops"><i class="bi bi-geo-alt-fill"></i> Điểm đón/trả</button>
+    </div>
+
+    <!-- ═══════════ TAB 1: LỊCH TRÌNH ═══════════ -->
+    <div class="c-tab-panel is-active" id="panelSchedule">
+      <div class="c-filter-bar">
+        <div class="c-filter-search"><i class="bi bi-search"></i><input type="text" id="schSearch" placeholder="Tìm theo tuyến đường..."/></div>
+        <div style="flex:1"></div>
+        <button class="c-btn c-btn--primary" id="btnAddTrip"><i class="bi bi-plus-lg"></i> Thêm lịch trình</button>
+      </div>
+      <div class="c-table-wrapper"><div style="overflow-x:auto"><table class="c-table"><thead><tr>
+        <th>Mã chuyến</th><th>Tuyến đường</th><th>Ngày KH</th><th>Giờ KH</th><th style="text-align:right">Giá vé</th><th style="text-align:center">Số ghế</th><th>Trạng thái</th><th style="text-align:center">Thao tác</th>
+      </tr></thead><tbody id="schBody"></tbody></table></div></div>
+    </div>
+
+    <!-- ═══════════ TAB 2: PHÂN CÔNG XE ═══════════ -->
+    <div class="c-tab-panel" id="panelVehicle">
+      <div class="c-table-wrapper"><div style="overflow-x:auto"><table class="c-table"><thead><tr>
+        <th>Mã chuyến</th><th>Tuyến đường</th><th>Giờ KH</th><th>Xe hiện tại</th><th>Trạng thái</th><th style="text-align:center">Thao tác</th>
+      </tr></thead><tbody id="vehBody"></tbody></table></div></div>
+    </div>
+
+    <!-- ═══════════ TAB 3: PHÂN CÔNG TÀI XẾ ═══════════ -->
+    <div class="c-tab-panel" id="panelDriver">
+      <div class="c-table-wrapper"><div style="overflow-x:auto"><table class="c-table"><thead><tr>
+        <th>Mã chuyến</th><th>Tuyến đường</th><th>Ngày KH</th><th>Giờ KH</th><th>Tài xế hiện tại</th><th>Trạng thái</th><th style="text-align:center">Thao tác</th>
+      </tr></thead><tbody id="drvBody"></tbody></table></div></div>
+    </div>
+
+    <!-- ═══════════ TAB 4: ĐIỂM ĐÓN/TRẢ ═══════════ -->
+    <div class="c-tab-panel" id="panelStops">
+      <div class="c-table-wrapper"><div style="overflow-x:auto"><table class="c-table"><thead><tr>
+        <th>Mã chuyến</th><th>Tuyến đường</th><th>Điểm đón</th><th>Điểm trả</th><th style="text-align:center">Thao tác</th>
+      </tr></thead><tbody id="stpBody"></tbody></table></div></div>
+    </div>
+  </main>
+
+  <!-- ═══════════ MODAL: THÊM / SỬA LỊCH TRÌNH ═══════════ -->
+  <div class="c-modal-overlay" id="modalSchedule"><div class="c-modal">
+    <div class="c-modal-header"><h3 class="c-modal-title" id="schModalTitle"><i class="bi bi-calendar-plus" style="color:var(--clr-primary)"></i> Thêm lịch trình</h3><button class="c-modal-close" onclick="X.close('modalSchedule')"><i class="bi bi-x-lg"></i></button></div>
+    <div class="c-modal-body">
+      <input type="hidden" id="schEditId"/>
+      <div class="form-grid">
+        <div class="c-form-group fw"><label class="c-label">Tuyến đường <span class="req">*</span></label><select class="c-input c-select" id="schRoute"><option value="">— Chọn tuyến —</option></select></div>
+        <div class="c-form-group"><label class="c-label">Ngày khởi hành <span class="req">*</span></label><input type="date" class="c-input" id="schDate"/></div>
+        <div class="c-form-group"><label class="c-label">Giờ khởi hành <span class="req">*</span></label><input type="time" class="c-input" id="schTime"/></div>
+        <div class="c-form-group"><label class="c-label">Giá vé (VNĐ) <span class="req">*</span></label><input type="number" class="c-input" id="schPrice" placeholder="250000"/></div>
+        <div class="c-form-group"><label class="c-label">Số ghế <span class="req">*</span></label><input type="number" class="c-input" id="schSeats" placeholder="40"/></div>
+      </div>
+    </div>
+    <div class="c-modal-footer"><button class="c-btn c-btn--ghost" onclick="X.close('modalSchedule')">Hủy</button><button class="c-btn c-btn--primary" id="btnSaveSch"><i class="bi bi-check-lg"></i> Lưu</button></div>
+  </div></div>
+
+  <!-- ═══════════ MODAL: XÁC NHẬN XÓA ═══════════ -->
+  <div class="c-modal-overlay" id="modalDelete"><div class="c-modal" style="max-width:420px">
+    <div class="c-modal-header"><h3 class="c-modal-title">Xác nhận xóa</h3><button class="c-modal-close" onclick="X.close('modalDelete')"><i class="bi bi-x-lg"></i></button></div>
+    <div class="c-modal-body" style="text-align:center">
+      <div class="confirm-icon confirm-icon--danger"><i class="bi bi-trash3-fill"></i></div>
+      <p class="confirm-text" id="delText">Xóa lịch trình này?</p>
+      <p class="confirm-sub">Hành động này không thể hoàn tác.</p>
+    </div>
+    <div class="c-modal-footer" style="justify-content:center"><button class="c-btn c-btn--ghost" onclick="X.close('modalDelete')">Hủy bỏ</button><button class="c-btn c-btn--danger" id="btnConfirmDel"><i class="bi bi-trash3"></i> Xóa</button></div>
+  </div></div>
+
+  <!-- ═══════════ MODAL: CHỌN XE ═══════════ -->
+  <div class="c-modal-overlay" id="modalPickVeh"><div class="c-modal c-modal--lg">
+    <div class="c-modal-header"><h3 class="c-modal-title"><i class="bi bi-truck-front-fill" style="color:var(--clr-primary)"></i> Chọn xe cho chuyến <span id="pickVehTrip"></span></h3><button class="c-modal-close" onclick="X.close('modalPickVeh')"><i class="bi bi-x-lg"></i></button></div>
+    <div class="c-modal-body">
+      <div class="c-filter-search" style="max-width:100%;margin-bottom:14px"><i class="bi bi-search"></i><input type="text" id="vehPickSearch" placeholder="Tìm biển số, loại xe..."/></div>
+      <div class="pick-list" id="vehPickList"></div>
+    </div>
+  </div></div>
+
+  <!-- ═══════════ MODAL: CHỌN TÀI XẾ ═══════════ -->
+  <div class="c-modal-overlay" id="modalPickDrv"><div class="c-modal c-modal--lg">
+    <div class="c-modal-header"><h3 class="c-modal-title"><i class="bi bi-person-badge-fill" style="color:var(--clr-primary)"></i> Chọn tài xế cho chuyến <span id="pickDrvTrip"></span></h3><button class="c-modal-close" onclick="X.close('modalPickDrv')"><i class="bi bi-x-lg"></i></button></div>
+    <div class="c-modal-body">
+      <div id="drvConflictAlert"></div>
+      <div class="c-filter-search" style="max-width:100%;margin-bottom:14px"><i class="bi bi-search"></i><input type="text" id="drvPickSearch" placeholder="Tìm tên tài xế, SĐT..."/></div>
+      <div class="pick-list" id="drvPickList"></div>
+    </div>
+  </div></div>
+
+  <!-- ═══════════ MODAL: ĐIỂM ĐÓN/TRẢ ═══════════ -->
+  <div class="c-modal-overlay" id="modalStops"><div class="c-modal">
+    <div class="c-modal-header"><h3 class="c-modal-title"><i class="bi bi-geo-alt-fill" style="color:var(--clr-primary)"></i> Thiết lập điểm đón/trả — <span id="stpTripLabel"></span></h3><button class="c-modal-close" onclick="X.close('modalStops')"><i class="bi bi-x-lg"></i></button></div>
+    <div class="c-modal-body">
+      <input type="hidden" id="stpEditId"/>
+      <div class="c-form-group"><label class="c-label">Điểm đón <span class="req">*</span></label><select class="c-input c-select" id="stpPickup"><option value="">— Chọn hoặc nhập điểm đón —</option></select></div>
+      <div class="c-form-group" style="margin-bottom:0"><label class="c-label">Điểm trả <span class="req">*</span></label><select class="c-input c-select" id="stpDropoff"><option value="">— Chọn hoặc nhập điểm trả —</option></select></div>
+    </div>
+    <div class="c-modal-footer"><button class="c-btn c-btn--ghost" onclick="X.close('modalStops')">Hủy</button><button class="c-btn c-btn--primary" id="btnSaveStp"><i class="bi bi-check-lg"></i> Lưu</button></div>
+  </div></div>
+
+  <div class="c-toast" id="toast"></div>
+
+  <!-- Auth guard -->
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       JAVASCRIPT
+       ═══════════════════════════════════════════════════════════ -->
+  <script>
+  var X = (function(){
+  'use strict';
+
+  /* ══════════════════════════════════════════
+     DỮ LIỆU MẪU
+     ══════════════════════════════════════════ */
+  /* 15 tuyến đường */
+  var ROUTES = [
+    'Hà Nội → Hải Phòng','Hà Nội → Đà Nẵng','Hà Nội → Vinh','Hà Nội → Thanh Hóa','Hà Nội → Lào Cai',
+    'TP.HCM → Đà Lạt','TP.HCM → Nha Trang','TP.HCM → Cần Thơ','TP.HCM → Vũng Tàu','TP.HCM → Phan Thiết',
+    'Đà Nẵng → Huế','Đà Nẵng → Quảng Ngãi','Huế → Đà Nẵng','Nha Trang → TP.HCM','Cần Thơ → TP.HCM'
+  ];
+
+  /* 10 điểm đón / trả phổ biến */
+  var POINTS = [
+    'Bến xe Mỹ Đình','Bến xe Giáp Bát','Bến xe Nước Ngầm','Bến xe Miền Đông','Bến xe Miền Tây',
+    'Bến xe Trung tâm Đà Nẵng','Bến xe Phía Nam (Huế)','Bến xe Nha Trang','Ngã tư Hàng Xanh','Bến xe Cần Thơ'
+  ];
+
+  /* 15 chuyến xe */
+  var trips = [
+    {id:'CX-001',route:'Hà Nội → Hải Phòng',  date:'2026-10-06',time:'06:00',price:150000,seats:40,status:'pending',  vehicleId:'XE-01',driverId:'TX-01',pickup:'Bến xe Mỹ Đình',        dropoff:'Bến xe Niệm Nghĩa (Hải Phòng)'},
+    {id:'CX-002',route:'TP.HCM → Đà Lạt',     date:'2026-10-06',time:'08:00',price:280000,seats:34,status:'pending',  vehicleId:'XE-03',driverId:'TX-03',pickup:'Bến xe Miền Đông',       dropoff:'Bến xe Đà Lạt'},
+    {id:'CX-003',route:'Đà Nẵng → Huế',        date:'2026-10-06',time:'09:30',price:120000,seats:40,status:'running',  vehicleId:'XE-05',driverId:'TX-05',pickup:'Bến xe Trung tâm Đà Nẵng',dropoff:'Bến xe Phía Nam (Huế)'},
+    {id:'CX-004',route:'Hà Nội → Đà Nẵng',     date:'2026-10-06',time:'19:00',price:450000,seats:22,status:'pending',  vehicleId:'XE-07',driverId:'TX-07',pickup:'Bến xe Nước Ngầm',       dropoff:'Bến xe Trung tâm Đà Nẵng'},
+    {id:'CX-005',route:'TP.HCM → Nha Trang',   date:'2026-10-06',time:'21:00',price:350000,seats:34,status:'pending',  vehicleId:'',    driverId:'',     pickup:'',                        dropoff:''},
+    {id:'CX-006',route:'Hà Nội → Vinh',         date:'2026-10-07',time:'05:30',price:220000,seats:40,status:'pending',  vehicleId:'XE-02',driverId:'TX-02',pickup:'Bến xe Giáp Bát',         dropoff:'Bến xe Vinh'},
+    {id:'CX-007',route:'TP.HCM → Cần Thơ',     date:'2026-10-07',time:'07:00',price:160000,seats:40,status:'pending',  vehicleId:'',    driverId:'',     pickup:'',                        dropoff:''},
+    {id:'CX-008',route:'Hà Nội → Thanh Hóa',   date:'2026-10-07',time:'08:00',price:180000,seats:40,status:'pending',  vehicleId:'XE-04',driverId:'',     pickup:'Bến xe Giáp Bát',         dropoff:'Bến xe Thanh Hóa'},
+    {id:'CX-009',route:'TP.HCM → Vũng Tàu',    date:'2026-10-07',time:'10:00',price:120000,seats:22,status:'pending',  vehicleId:'',    driverId:'TX-06',pickup:'Ngã tư Hàng Xanh',         dropoff:'Bến xe Vũng Tàu'},
+    {id:'CX-010',route:'Đà Nẵng → Quảng Ngãi', date:'2026-10-07',time:'14:00',price:95000, seats:40,status:'pending',  vehicleId:'XE-05',driverId:'TX-05',pickup:'Bến xe Trung tâm Đà Nẵng',dropoff:'Bến xe Quảng Ngãi'},
+    {id:'CX-011',route:'Hà Nội → Lào Cai',      date:'2026-10-08',time:'19:30',price:320000,seats:34,status:'pending',  vehicleId:'',    driverId:'',     pickup:'',                        dropoff:''},
+    {id:'CX-012',route:'TP.HCM → Phan Thiết',  date:'2026-10-08',time:'06:00',price:180000,seats:40,status:'pending',  vehicleId:'XE-08',driverId:'TX-08',pickup:'Bến xe Miền Đông',        dropoff:'Bến xe Phan Thiết'},
+    {id:'CX-013',route:'Huế → Đà Nẵng',        date:'2026-10-05',time:'15:00',price:120000,seats:40,status:'completed',vehicleId:'XE-05',driverId:'TX-05',pickup:'Bến xe Phía Nam (Huế)',   dropoff:'Bến xe Trung tâm Đà Nẵng'},
+    {id:'CX-014',route:'Nha Trang → TP.HCM',   date:'2026-10-05',time:'20:00',price:350000,seats:34,status:'completed',vehicleId:'XE-09',driverId:'TX-09',pickup:'Bến xe Nha Trang',        dropoff:'Bến xe Miền Đông'},
+    {id:'CX-015',route:'Cần Thơ → TP.HCM',     date:'2026-10-05',time:'16:00',price:160000,seats:40,status:'completed',vehicleId:'XE-10',driverId:'TX-10',pickup:'Bến xe Cần Thơ',          dropoff:'Bến xe Miền Tây'},
+  ];
+
+  /* 10 xe */
+  var vehicles = [
+    {id:'XE-01',plate:'29A-12345',type:'Ghế ngồi',   seats:40,status:'active'},
+    {id:'XE-02',plate:'29A-23456',type:'Ghế ngồi',   seats:40,status:'active'},
+    {id:'XE-03',plate:'51B-34567',type:'Giường nằm',  seats:34,status:'active'},
+    {id:'XE-04',plate:'29A-45678',type:'Ghế ngồi',   seats:40,status:'active'},
+    {id:'XE-05',plate:'43C-56789',type:'Ghế ngồi',   seats:40,status:'active'},
+    {id:'XE-06',plate:'51B-67890',type:'Limousine',   seats:22,status:'maintenance'},
+    {id:'XE-07',plate:'29A-78901',type:'Limousine',   seats:22,status:'active'},
+    {id:'XE-08',plate:'51B-89012',type:'Giường nằm',  seats:34,status:'active'},
+    {id:'XE-09',plate:'51B-90123',type:'Giường nằm',  seats:34,status:'active'},
+    {id:'XE-10',plate:'65D-01234',type:'Ghế ngồi',   seats:40,status:'active'},
+  ];
+
+  /* 10 tài xế */
+  var drivers = [
+    {id:'TX-01',name:'Nguyễn Văn Tùng',  phone:'0901 111 001',tripCount:12},
+    {id:'TX-02',name:'Trần Đức Mạnh',    phone:'0901 111 002',tripCount:9},
+    {id:'TX-03',name:'Lê Quốc Bảo',      phone:'0901 111 003',tripCount:15},
+    {id:'TX-04',name:'Phạm Hữu Tài',     phone:'0901 111 004',tripCount:7},
+    {id:'TX-05',name:'Võ Minh Tuấn',      phone:'0901 111 005',tripCount:18},
+    {id:'TX-06',name:'Hoàng Anh Dũng',   phone:'0901 111 006',tripCount:11},
+    {id:'TX-07',name:'Đặng Văn Hùng',    phone:'0901 111 007',tripCount:6},
+    {id:'TX-08',name:'Bùi Thanh Sơn',    phone:'0901 111 008',tripCount:14},
+    {id:'TX-09',name:'Ngô Đình Khôi',    phone:'0901 111 009',tripCount:10},
+    {id:'TX-10',name:'Phan Quang Vinh',  phone:'0901 111 010',tripCount:8},
+  ];
+
+  var TRIP_ST = {
+    pending:  {label:'Chưa khởi hành',cls:'c-badge--warning',icon:'bi-clock-fill'},
+    running:  {label:'Đang chạy',     cls:'c-badge--info',   icon:'bi-play-circle-fill'},
+    completed:{label:'Đã hoàn thành', cls:'c-badge--success',icon:'bi-check-circle-fill'},
+  };
+
+  /* ══════════════════════════════════════════
+     HELPERS
+     ══════════════════════════════════════════ */
+  function find(arr,id){return arr.find(function(x){return x.id===id});}
+  function fmtDate(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+  function fmtPrice(n){return Number(n).toLocaleString('vi-VN')+'đ';}
+  function toast(m,t){var e=document.getElementById('toast');var ic={success:'bi-check-circle-fill',danger:'bi-x-circle-fill',warning:'bi-exclamation-triangle-fill',info:'bi-info-circle-fill'};e.className='c-toast c-toast--'+(t||'success');e.innerHTML='<i class="bi '+(ic[t]||ic.success)+'"></i> '+m;e.classList.add('is-visible');clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('is-visible')},3000);}
+  function open(id){document.getElementById(id).classList.add('is-open');document.body.style.overflow='hidden';}
+  function close(id){document.getElementById(id).classList.remove('is-open');document.body.style.overflow='';}
+
+  /* ══════════════════════════════════════════
+     TAB SWITCHING
+     ══════════════════════════════════════════ */
+  function initTabs(){
+    document.querySelectorAll('.c-page-tab').forEach(function(tab){
+      tab.addEventListener('click',function(){
+        document.querySelectorAll('.c-page-tab').forEach(function(t){t.classList.remove('is-active');});
+        this.classList.add('is-active');
+        document.querySelectorAll('.c-tab-panel').forEach(function(p){p.classList.remove('is-active');});
+        document.getElementById(this.dataset.tab).classList.add('is-active');
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════
+     TAB 1 — LỊCH TRÌNH
+     ══════════════════════════════════════════ */
+  function renderSchedule(){
+    var q = (document.getElementById('schSearch').value||'').toLowerCase();
+    var list = trips.filter(function(t){return !q || t.route.toLowerCase().indexOf(q)!==-1;});
+    var b = document.getElementById('schBody');
+    if(!list.length){b.innerHTML='<tr><td colspan="8" class="empty-state"><i class="bi bi-calendar-x"></i>Không tìm thấy lịch trình.</td></tr>';return;}
+    b.innerHTML = list.map(function(t){
+      var s=TRIP_ST[t.status]||TRIP_ST.pending;
+      return '<tr><td><strong>'+t.id+'</strong></td><td>'+t.route+'</td><td>'+fmtDate(t.date)+'</td><td>'+t.time+'</td><td style="text-align:right">'+fmtPrice(t.price)+'</td><td style="text-align:center">'+t.seats+'</td><td><span class="c-badge '+s.cls+'"><i class="bi '+s.icon+'"></i> '+s.label+'</span></td>'+
+      '<td style="text-align:center;white-space:nowrap"><button class="c-btn c-btn--ghost c-btn--icon c-btn--sm js-sch-edit" data-id="'+t.id+'" title="Sửa"><i class="bi bi-pencil"></i></button> <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm js-sch-del" data-id="'+t.id+'" title="Xóa" style="color:var(--clr-danger)"><i class="bi bi-trash3"></i></button></td></tr>';
+    }).join('');
+    b.querySelectorAll('.js-sch-edit').forEach(function(btn){btn.addEventListener('click',function(){openSchModal(this.dataset.id);});});
+    b.querySelectorAll('.js-sch-del').forEach(function(btn){btn.addEventListener('click',function(){openDeleteConfirm(this.dataset.id);});});
+  }
+
+  /* Mở modal Thêm / Sửa lịch trình */
+  function openSchModal(editId){
+    var sel = document.getElementById('schRoute');
+    sel.innerHTML='<option value="">— Chọn tuyến —</option>'+ROUTES.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join('');
+    if(editId){
+      var t=find(trips,editId);if(!t)return;
+      document.getElementById('schModalTitle').innerHTML='<i class="bi bi-pencil-square" style="color:var(--clr-primary)"></i> Sửa lịch trình — '+t.id;
+      document.getElementById('schEditId').value=editId;
+      sel.value=t.route;document.getElementById('schDate').value=t.date;document.getElementById('schTime').value=t.time;
+      document.getElementById('schPrice').value=t.price;document.getElementById('schSeats').value=t.seats;
+    } else {
+      document.getElementById('schModalTitle').innerHTML='<i class="bi bi-calendar-plus" style="color:var(--clr-primary)"></i> Thêm lịch trình';
+      document.getElementById('schEditId').value='';
+      sel.value='';document.getElementById('schDate').value='';document.getElementById('schTime').value='';
+      document.getElementById('schPrice').value='';document.getElementById('schSeats').value='';
+    }
+    open('modalSchedule');
+  }
+
+  function saveSchedule(){
+    var route=document.getElementById('schRoute').value,date=document.getElementById('schDate').value,time=document.getElementById('schTime').value,price=document.getElementById('schPrice').value,seats=document.getElementById('schSeats').value;
+    if(!route||!date||!time||!price||!seats){toast('Vui lòng điền đầy đủ thông tin.','warning');return;}
+    var editId=document.getElementById('schEditId').value;
+    if(editId){
+      var t=find(trips,editId);if(t){t.route=route;t.date=date;t.time=time;t.price=Number(price);t.seats=Number(seats);}
+      toast('Đã cập nhật lịch trình '+editId+'.','success');
+    } else {
+      var newId='CX-'+String(trips.length+1).padStart(3,'0');
+      trips.push({id:newId,route:route,date:date,time:time,price:Number(price),seats:Number(seats),status:'pending',vehicleId:'',driverId:'',pickup:'',dropoff:''});
+      toast('Đã thêm lịch trình '+newId+' thành công!','success');
+    }
+    close('modalSchedule');renderAll();
+  }
+
+  /* Xóa lịch trình */
+  var pendingDelId='';
+  function openDeleteConfirm(id){
+    pendingDelId=id;
+    document.getElementById('delText').textContent='Xóa lịch trình '+id+' ?';
+    open('modalDelete');
+  }
+  function confirmDelete(){
+    trips=trips.filter(function(t){return t.id!==pendingDelId;});
+    close('modalDelete');renderAll();toast('Đã xóa lịch trình '+pendingDelId+'.','danger');
+  }
+
+  /* ══════════════════════════════════════════
+     TAB 2 — PHÂN CÔNG XE
+     ══════════════════════════════════════════ */
+  function renderVehicle(){
+    var b=document.getElementById('vehBody');
+    b.innerHTML=trips.map(function(t){
+      var v=t.vehicleId?find(vehicles,t.vehicleId):null;
+      var assigned=!!v;
+      var vehLabel=v?('<strong>'+v.plate+'</strong> · '+v.type+' · '+v.seats+' ghế'):'<span style="color:var(--clr-text-secondary)">— Chưa có —</span>';
+      var stBadge=assigned?'<span class="c-badge c-badge--success"><i class="bi bi-check-circle-fill"></i> Đã phân công</span>':'<span class="c-badge c-badge--warning"><i class="bi bi-clock-fill"></i> Chưa phân công</span>';
+      var btnLabel=assigned?'Đổi xe':'Chọn xe';
+      return '<tr><td><strong>'+t.id+'</strong></td><td>'+t.route+'</td><td>'+t.time+'</td><td>'+vehLabel+'</td><td>'+stBadge+'</td>'+
+      '<td style="text-align:center"><button class="c-btn c-btn--secondary c-btn--sm js-pick-veh" data-id="'+t.id+'"><i class="bi bi-truck-front"></i> '+btnLabel+'</button></td></tr>';
+    }).join('');
+    b.querySelectorAll('.js-pick-veh').forEach(function(btn){btn.addEventListener('click',function(){openPickVehicle(this.dataset.id);});});
+  }
+
+  var pickVehTripId='';
+  function openPickVehicle(tripId){
+    pickVehTripId=tripId;
+    document.getElementById('pickVehTrip').textContent=tripId;
+    document.getElementById('vehPickSearch').value='';
+    renderVehPickList('');
+    open('modalPickVeh');
+  }
+  function renderVehPickList(q){
+    var list=vehicles.filter(function(v){
+      if(q){var s=q.toLowerCase();return v.plate.toLowerCase().indexOf(s)!==-1||v.type.toLowerCase().indexOf(s)!==-1;}return true;
+    });
+    var el=document.getElementById('vehPickList');
+    el.innerHTML=list.map(function(v){
+      var disabled=v.status!=='active';
+      var stLabel=v.status==='active'?'Đang hoạt động':'Đang bảo trì';
+      var stCls=v.status==='active'?'c-badge--success':'c-badge--danger';
+      return '<div class="pick-item'+(disabled?' is-disabled':'')+'" data-vid="'+v.id+'"'+(!disabled?' role="button" tabindex="0"':'')+'><div class="pick-main"><div class="pick-title">'+v.plate+'</div><div class="pick-sub">'+v.type+' · '+v.seats+' ghế</div></div><span class="c-badge '+stCls+'" style="font-size:11px">'+stLabel+'</span></div>';
+    }).join('');
+    el.querySelectorAll('.pick-item:not(.is-disabled)').forEach(function(item){
+      item.addEventListener('click',function(){
+        var vid=this.dataset.vid;var t=find(trips,pickVehTripId);if(t)t.vehicleId=vid;
+        close('modalPickVeh');renderAll();toast('Đã phân công xe '+find(vehicles,vid).plate+' cho chuyến '+pickVehTripId+'.','success');
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════
+     TAB 3 — PHÂN CÔNG TÀI XẾ
+     ══════════════════════════════════════════ */
+  function renderDriver(){
+    var b=document.getElementById('drvBody');
+    b.innerHTML=trips.map(function(t){
+      var d=t.driverId?find(drivers,t.driverId):null;
+      var assigned=!!d;
+      var drvLabel=d?('<strong>'+d.name+'</strong> · '+d.phone):'<span style="color:var(--clr-text-secondary)">— Chưa có —</span>';
+      var stBadge=assigned?'<span class="c-badge c-badge--success"><i class="bi bi-check-circle-fill"></i> Đã phân công</span>':'<span class="c-badge c-badge--warning"><i class="bi bi-clock-fill"></i> Chưa phân công</span>';
+      var btnLabel=assigned?'Đổi tài xế':'Chọn tài xế';
+      return '<tr><td><strong>'+t.id+'</strong></td><td>'+t.route+'</td><td>'+fmtDate(t.date)+'</td><td>'+t.time+'</td><td>'+drvLabel+'</td><td>'+stBadge+'</td>'+
+      '<td style="text-align:center"><button class="c-btn c-btn--secondary c-btn--sm js-pick-drv" data-id="'+t.id+'"><i class="bi bi-person-check"></i> '+btnLabel+'</button></td></tr>';
+    }).join('');
+    b.querySelectorAll('.js-pick-drv').forEach(function(btn){btn.addEventListener('click',function(){openPickDriver(this.dataset.id);});});
+  }
+
+  var pickDrvTripId='';
+  function openPickDriver(tripId){
+    pickDrvTripId=tripId;
+    document.getElementById('pickDrvTrip').textContent=tripId;
+    document.getElementById('drvPickSearch').value='';
+    document.getElementById('drvConflictAlert').innerHTML='';
+    renderDrvPickList('');
+    open('modalPickDrv');
+  }
+
+  /* Kiểm tra trùng lịch tài xế */
+  function getConflict(driverId,tripId){
+    var target=find(trips,tripId);if(!target)return null;
+    return trips.find(function(t){
+      return t.id!==tripId && t.driverId===driverId && t.date===target.date && t.status!=='completed';
+    });
+  }
+
+  function renderDrvPickList(q){
+    var list=drivers.filter(function(d){
+      if(q){var s=q.toLowerCase();return d.name.toLowerCase().indexOf(s)!==-1||d.phone.replace(/\s/g,'').indexOf(s.replace(/\s/g,''))!==-1;}return true;
+    });
+    var el=document.getElementById('drvPickList');
+    el.innerHTML=list.map(function(d){
+      var conflict=getConflict(d.id,pickDrvTripId);
+      var conflictHtml=conflict?'<div style="font-size:11px;color:var(--clr-danger);margin-top:2px"><i class="bi bi-exclamation-triangle-fill"></i> Đã có chuyến '+conflict.id+' lúc '+conflict.time+' ngày '+fmtDate(conflict.date)+'</div>':'';
+      var disabled=!!conflict;
+      return '<div class="pick-item'+(disabled?' is-disabled':'')+'" data-did="'+d.id+'"'+(!disabled?' role="button" tabindex="0"':'')+'><div class="pick-main"><div class="pick-title">'+d.name+'</div><div class="pick-sub">'+d.phone+' · '+d.tripCount+' chuyến đã nhận'+conflictHtml+'</div></div>'+(disabled?'<span class="c-badge c-badge--danger" style="font-size:11px">Trùng lịch</span>':'<span class="c-badge c-badge--success" style="font-size:11px">Rảnh</span>')+'</div>';
+    }).join('');
+    el.querySelectorAll('.pick-item:not(.is-disabled)').forEach(function(item){
+      item.addEventListener('click',function(){
+        var did=this.dataset.did;var t=find(trips,pickDrvTripId);if(t)t.driverId=did;
+        var d=find(drivers,did);if(d)d.tripCount++;
+        close('modalPickDrv');renderAll();toast('Đã phân công tài xế '+find(drivers,did).name+' cho chuyến '+pickDrvTripId+'.','success');
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════
+     TAB 4 — ĐIỂM ĐÓN / TRẢ
+     ══════════════════════════════════════════ */
+  function renderStops(){
+    var b=document.getElementById('stpBody');
+    b.innerHTML=trips.map(function(t){
+      var hasStops=t.pickup&&t.dropoff;
+      var puLabel=t.pickup||'<span style="color:var(--clr-text-secondary)">— Chưa thiết lập —</span>';
+      var doLabel=t.dropoff||'<span style="color:var(--clr-text-secondary)">— Chưa thiết lập —</span>';
+      var btnLabel=hasStops?'Sửa':'Thiết lập';
+      var btnCls=hasStops?'c-btn--ghost':'c-btn--secondary';
+      return '<tr><td><strong>'+t.id+'</strong></td><td>'+t.route+'</td><td>'+puLabel+'</td><td>'+doLabel+'</td>'+
+      '<td style="text-align:center"><button class="c-btn '+btnCls+' c-btn--sm js-stp" data-id="'+t.id+'"><i class="bi bi-geo-alt"></i> '+btnLabel+'</button></td></tr>';
+    }).join('');
+    b.querySelectorAll('.js-stp').forEach(function(btn){btn.addEventListener('click',function(){openStopsModal(this.dataset.id);});});
+  }
+
+  function openStopsModal(tripId){
+    var t=find(trips,tripId);if(!t)return;
+    document.getElementById('stpEditId').value=tripId;
+    document.getElementById('stpTripLabel').textContent=tripId+' ('+t.route+')';
+    /* Tạo dropdown điểm đón */
+    var opts='<option value="">— Chọn điểm —</option>'+POINTS.map(function(p){return '<option value="'+p+'">'+p+'</option>';}).join('');
+    var pu=document.getElementById('stpPickup');pu.innerHTML=opts;if(t.pickup)pu.value=t.pickup;
+    var dof=document.getElementById('stpDropoff');dof.innerHTML=opts;if(t.dropoff)dof.value=t.dropoff;
+    open('modalStops');
+  }
+
+  function saveStops(){
+    var id=document.getElementById('stpEditId').value;
+    var pu=document.getElementById('stpPickup').value;
+    var dof=document.getElementById('stpDropoff').value;
+    if(!pu||!dof){toast('Vui lòng chọn cả điểm đón và điểm trả.','warning');return;}
+    var t=find(trips,id);if(t){t.pickup=pu;t.dropoff=dof;}
+    close('modalStops');renderAll();toast('Đã lưu điểm đón/trả cho chuyến '+id+'.','success');
+  }
+
+  /* ══════════════════════════════════════════
+     RENDER ALL
+     ══════════════════════════════════════════ */
+  function renderAll(){renderSchedule();renderVehicle();renderDriver();renderStops();}
+
+  /* ══════════════════════════════════════════
+     SIDEBAR
+     ══════════════════════════════════════════ */
+  function initSidebar(){
+    var sb=document.getElementById('sidebar'),tg=document.getElementById('sidebarToggle'),ov=document.getElementById('sidebarOverlay');
+    if(!tg)return;
+    function cls(){sb.classList.remove('is-open');ov.classList.remove('is-visible');document.body.style.overflow='';}
+    tg.addEventListener('click',function(){var o=sb.classList.toggle('is-open');ov.classList.toggle('is-visible',o);document.body.style.overflow=o?'hidden':'';});
+    ov.addEventListener('click',cls);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')cls();});
+    window.addEventListener('resize',function(){if(window.innerWidth>=992)cls();});
+  }
+
+  /* ══════════════════════════════════════════
+     INIT
+     ══════════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded',function(){
+    initSidebar();initTabs();renderAll();
+
+    /* Tìm kiếm lịch trình */
+    document.getElementById('schSearch').addEventListener('input',function(){renderSchedule();});
+
+    /* Tìm kiếm xe trong modal */
+    document.getElementById('vehPickSearch').addEventListener('input',function(){renderVehPickList(this.value);});
+
+    /* Tìm kiếm tài xế trong modal */
+    document.getElementById('drvPickSearch').addEventListener('input',function(){renderDrvPickList(this.value);});
+
+    /* Nút thêm lịch trình */
+    document.getElementById('btnAddTrip').addEventListener('click',function(){openSchModal();});
+    document.getElementById('btnSaveSch').addEventListener('click',saveSchedule);
+
+    /* Xóa */
+    document.getElementById('btnConfirmDel').addEventListener('click',confirmDelete);
+
+    /* Lưu điểm đón/trả */
+    document.getElementById('btnSaveStp').addEventListener('click',saveStops);
+
+    /* Đóng modal qua overlay */
+    document.querySelectorAll('.c-modal-overlay').forEach(function(ov){
+      ov.addEventListener('click',function(e){if(e.target===this){this.classList.remove('is-open');document.body.style.overflow='';}});
+    });
+
+    /* Escape đóng modal */
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'){document.querySelectorAll('.c-modal-overlay.is-open').forEach(function(m){m.classList.remove('is-open');});document.body.style.overflow='';}
+    });
+  });
+
+  return {close:close};
+  })();
+  </script>
+</body>
+</html>

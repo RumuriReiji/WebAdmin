@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Quản lý Doanh thu — Nhà xe Trác Truyệt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --clr-primary:#1976D2;--clr-primary-dark:#1565C0;--clr-primary-light:#BBDEFB;
+      --clr-success:#2E7D32;--clr-success-light:#E8F5E9;
+      --clr-warning:#F57C00;--clr-warning-light:#FFF3E0;
+      --clr-danger:#D32F2F;--clr-danger-light:#FFEBEE;
+      --clr-info:#0288D1;--clr-info-light:#E3F2FD;
+      --clr-bg:#F5F5F5;--clr-surface:#FFFFFF;
+      --clr-text:#212121;--clr-text-secondary:#757575;--clr-border:#E0E0E0;
+      --clr-sidebar-bg:#0D47A1;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.10);--shadow-lg:0 8px 24px rgba(0,0,0,.14);
+      --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-pill:20px;
+      --font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      --sidebar-w:260px;--header-h:56px;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:var(--font-family);font-size:14px;color:var(--clr-text);background:var(--clr-bg);line-height:1.6;margin:0}
+
+    /* ═══ SIDEBAR ═══ */
+    .layout-sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--clr-sidebar-bg);color:#fff;z-index:1040;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto}
+    .layout-sidebar::-webkit-scrollbar{width:4px}.layout-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:4px}
+    .sidebar-brand{height:var(--header-h);display:flex;align-items:center;gap:10px;padding:0 20px;font-size:17px;font-weight:700;letter-spacing:-.3px;border-bottom:1px solid rgba(255,255,255,.12);flex-shrink:0}.sidebar-brand i{font-size:24px}
+    .sidebar-nav{list-style:none;padding:12px 0;margin:0;flex:1}
+    .sidebar-nav-label{padding:16px 20px 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4)}
+    .sidebar-nav-item a{display:flex;align-items:center;gap:12px;padding:10px 20px;color:rgba(255,255,255,.72);text-decoration:none;font-size:14px;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+    .sidebar-nav-item a:hover{background:rgba(255,255,255,.08);color:#fff}
+    .sidebar-nav-item a.is-active{background:rgba(255,255,255,.15);border-left-color:#fff;color:#fff}
+    .sidebar-nav-item a i{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+
+    /* ═══ HEADER ═══ */
+    .layout-header{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--header-h);background:var(--clr-surface);box-shadow:var(--shadow-sm);z-index:1030;display:flex;align-items:center;justify-content:space-between;padding:0 24px;transition:left .3s}
+    .header-left{display:flex;align-items:center;gap:12px}.header-right{display:flex;align-items:center;gap:8px}
+    .header-toggle{display:none;border:none;background:none;font-size:22px;color:var(--clr-text);cursor:pointer;padding:4px;border-radius:var(--radius-sm)}.header-toggle:hover{background:var(--clr-bg)}
+    .header-breadcrumb{font-size:14px;color:var(--clr-text-secondary);display:flex;align-items:center;gap:6px}.header-breadcrumb span{color:var(--clr-text);font-weight:600}
+    .header-search{position:relative;min-width:260px}
+    .header-search input{width:100%;height:36px;padding:0 12px 0 36px;border:1px solid var(--clr-border);border-radius:var(--radius-sm);font-family:var(--font-family);font-size:13px;background:var(--clr-bg);color:var(--clr-text);transition:border-color .15s,box-shadow .15s,background .15s}
+    .header-search input:focus{outline:none;border-color:var(--clr-primary);box-shadow:0 0 0 3px rgba(25,118,210,.15);background:#fff}
+    .header-search input::placeholder{color:var(--clr-text-secondary)}
+    .header-search>i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--clr-text-secondary);font-size:15px;pointer-events:none}
+    .header-icon-btn{position:relative;border:none;background:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--clr-text-secondary);font-size:20px;transition:background .15s,color .15s}.header-icon-btn:hover{background:var(--clr-bg);color:var(--clr-text)}
+    .header-icon-btn .badge-dot{position:absolute;top:6px;right:7px;width:9px;height:9px;background:var(--clr-danger);border-radius:50%;border:2px solid var(--clr-surface)}
+    .header-avatar{width:34px;height:34px;border-radius:50%;background:var(--clr-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;cursor:pointer;margin-left:4px}
+
+    /* ═══ MAIN ═══ */
+    .layout-main{margin-left:var(--sidebar-w);margin-top:var(--header-h);padding:24px;min-height:calc(100vh - var(--header-h));transition:margin-left .3s}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1035;opacity:0;transition:opacity .3s}.sidebar-overlay.is-visible{display:block;opacity:1}
+
+    /* ═══ COMPONENTS ═══ */
+    .c-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 18px;font-family:var(--font-family);font-size:14px;font-weight:500;border-radius:var(--radius-sm);border:none;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1}
+    .c-btn:disabled{opacity:.5;cursor:not-allowed}
+    .c-btn--primary{background:var(--clr-primary);color:#fff}.c-btn--primary:hover:not(:disabled){background:var(--clr-primary-dark)}
+    .c-btn--ghost{background:transparent;color:var(--clr-text)}.c-btn--ghost:hover:not(:disabled){background:rgba(0,0,0,.04)}
+    .c-btn--sm{height:30px;padding:0 12px;font-size:13px}
+
+    .c-input{width:100%;height:38px;padding:0 12px;font-family:var(--font-family);font-size:14px;color:var(--clr-text);background:#fff;border:1px solid var(--clr-border);border-radius:var(--radius-sm);transition:border-color .15s,box-shadow .15s}
+    .c-input:focus{outline:none;border-color:var(--clr-primary);box-shadow:0 0 0 3px rgba(25,118,210,.15)}
+    .c-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+
+    .c-table-wrapper{background:var(--clr-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);overflow:hidden}
+    .c-table{width:100%;border-collapse:collapse}
+    .c-table thead th{background:#FAFAFA;padding:10px 14px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--clr-text-secondary);text-align:left;border-bottom:1px solid var(--clr-border);white-space:nowrap}
+    .c-table thead th.sortable{cursor:pointer;user-select:none}.c-table thead th.sortable:hover{color:var(--clr-primary)}
+    .c-table tbody td{padding:10px 14px;font-size:14px;border-bottom:1px solid var(--clr-border);vertical-align:middle}
+    .c-table tbody tr:last-child td{border-bottom:none}
+    .c-table tbody tr{transition:background .1s}.c-table tbody tr:hover{background:rgba(25,118,210,.03)}
+
+    .c-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:500;white-space:nowrap}
+    .c-badge--success{background:var(--clr-success-light);color:var(--clr-success)}
+    .c-badge--warning{background:var(--clr-warning-light);color:var(--clr-warning)}
+    .c-badge--danger{background:var(--clr-danger-light);color:var(--clr-danger)}
+    .c-badge--info{background:var(--clr-info-light);color:var(--clr-info)}
+
+    .c-pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--clr-border);font-size:13px;color:var(--clr-text-secondary);flex-wrap:wrap;gap:8px}
+    .c-pagination-nav{display:flex;align-items:center;gap:4px}
+    .c-pagination-btn{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border:1px solid var(--clr-border);border-radius:6px;background:#fff;color:var(--clr-text);font-family:var(--font-family);font-size:13px;cursor:pointer;transition:all .15s}
+    .c-pagination-btn:hover:not(:disabled):not(.is-active){border-color:var(--clr-primary);color:var(--clr-primary)}
+    .c-pagination-btn.is-active{background:var(--clr-primary);border-color:var(--clr-primary);color:#fff}
+    .c-pagination-btn:disabled{opacity:.4;cursor:not-allowed}
+
+    /* ═══ PAGE ═══ */
+    .page-header{margin-bottom:24px}
+    .page-title{font-size:24px;font-weight:700;margin:0;display:flex;align-items:center;gap:10px}.page-title i{color:var(--clr-primary)}
+    .page-subtitle{font-size:14px;color:var(--clr-text-secondary);margin:2px 0 0}
+
+    .c-page-tabs{display:flex;gap:0;border-bottom:2px solid var(--clr-border);margin-bottom:20px;overflow-x:auto}
+    .c-page-tab{position:relative;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-family:var(--font-family);font-size:14px;font-weight:500;color:var(--clr-text-secondary);background:none;border:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+    .c-page-tab:hover{color:var(--clr-text)}
+    .c-page-tab.is-active{color:var(--clr-primary);border-bottom-color:var(--clr-primary);font-weight:600}
+    .c-page-tab i{font-size:16px}
+    .c-tab-panel{display:none}.c-tab-panel.is-active{display:block;animation:tIn .2s ease}
+    @keyframes tIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Filter bar */
+    .c-filter-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+    .c-filter-select{height:38px;padding:0 36px 0 12px;font-family:var(--font-family);font-size:14px;color:var(--clr-text);background:#fff;border:1px solid var(--clr-border);border-radius:var(--radius-sm);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .15s}
+    .c-filter-select:focus{outline:none;border-color:var(--clr-primary)}
+    .date-range{display:none;align-items:center;gap:8px}.date-range.is-visible{display:flex}
+    .date-range input{height:38px;padding:0 12px;border:1px solid var(--clr-border);border-radius:var(--radius-sm);font-family:var(--font-family);font-size:14px;color:var(--clr-text);background:#fff}
+    .date-range input:focus{outline:none;border-color:var(--clr-primary);box-shadow:0 0 0 3px rgba(25,118,210,.15)}
+
+    /* KPI Cards */
+    .kpi-grid{display:grid;gap:16px;margin-bottom:20px}
+    .kpi-grid--4{grid-template-columns:repeat(4,1fr)}
+    .kpi-grid--3{grid-template-columns:repeat(3,1fr)}
+    .kpi-card{background:var(--clr-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);padding:20px;display:flex;align-items:center;gap:16px}
+    .kpi-icon{width:48px;height:48px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+    .kpi-icon--primary{background:var(--clr-info-light);color:var(--clr-primary)}
+    .kpi-icon--success{background:var(--clr-success-light);color:var(--clr-success)}
+    .kpi-icon--warning{background:var(--clr-warning-light);color:var(--clr-warning)}
+    .kpi-icon--danger{background:var(--clr-danger-light);color:var(--clr-danger)}
+    .kpi-icon--info{background:var(--clr-info-light);color:var(--clr-info)}
+    .kpi-value{font-size:22px;font-weight:700;line-height:1.2}
+    .kpi-label{font-size:12px;color:var(--clr-text-secondary);margin-top:2px}
+
+    /* Chart card */
+    .chart-card{background:var(--clr-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);padding:20px;margin-bottom:20px}
+    .chart-title{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .chart-title i{color:var(--clr-primary)}
+    .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+    @media(max-width:991.98px){.chart-row{grid-template-columns:1fr}}
+
+    /* Fill bar */
+    .fill-bar{height:8px;background:var(--clr-border);border-radius:4px;overflow:hidden;min-width:80px}
+    .fill-bar-inner{height:100%;border-radius:4px;transition:width .3s}
+
+    .empty-state{text-align:center;padding:40px 16px!important;color:var(--clr-text-secondary)}.empty-state i{font-size:36px;display:block;margin-bottom:8px;opacity:.3}
+
+    /* Responsive */
+    @media(max-width:991.98px){.layout-sidebar{transform:translateX(-100%)}.layout-sidebar.is-open{transform:translateX(0)}.layout-header{left:0}.layout-main{margin-left:0}.header-toggle{display:flex}.kpi-grid--4{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:767.98px){.kpi-grid--4,.kpi-grid--3{grid-template-columns:1fr}}
+    @media(max-width:575.98px){.header-search{display:none}.layout-main{padding:16px}}
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR — "Doanh thu" highlighted -->
+  <aside class="layout-sidebar" id="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-bus-front-fill"></i> Nhà xe Trác Truyệt</div>
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-label">Chính</li>
+      <li class="sidebar-nav-item"><a href="../index.html"><i class="bi bi-grid-1x2-fill"></i> Tổng quan</a></li>
+      <li class="sidebar-nav-label">Quản lý</li>
+      <li class="sidebar-nav-item"><a href="nhan-vien.html"><i class="bi bi-people-fill"></i> Nhân viên</a></li>
+      <li class="sidebar-nav-item"><a href="khach-hang.html"><i class="bi bi-person-fill"></i> Khách hàng</a></li>
+      <li class="sidebar-nav-item"><a href="chuyen-xe.html"><i class="bi bi-signpost-split-fill"></i> Chuyến xe</a></li>
+      <li class="sidebar-nav-item"><a href="ve-xe.html"><i class="bi bi-ticket-perforated-fill"></i> Vé xe</a></li>
+      <li class="sidebar-nav-item"><a href="quan-ly-xe.html"><i class="bi bi-truck-front-fill"></i> Xe</a></li>
+      <li class="sidebar-nav-label">Báo cáo</li>
+      <li class="sidebar-nav-item"><a href="doanh-thu.html" class="is-active"><i class="bi bi-graph-up-arrow"></i> Doanh thu</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- HEADER -->
+  <header class="layout-header">
+    <div class="header-left">
+      <button class="header-toggle" id="sidebarToggle" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+      <div class="header-breadcrumb"><i class="bi bi-house-fill" style="color:var(--clr-primary)"></i><span>/</span> Báo cáo <span>/</span> <span>Doanh thu</span></div>
+    </div>
+    <div class="header-right">
+      <div class="header-search"><i class="bi bi-search"></i><input type="text" placeholder="Tìm kiếm..."/></div>
+      <button class="header-icon-btn" title="Thông báo"><i class="bi bi-bell-fill"></i><span class="badge-dot"></span></button>
+      <div class="header-avatar" title="Admin">A</div>
+    </div>
+  </header>
+
+  <!-- NỘI DUNG -->
+  <main class="layout-main">
+    <div class="page-header">
+      <h1 class="page-title"><i class="bi bi-graph-up-arrow"></i> Quản lý Doanh thu</h1>
+      <p class="page-subtitle">Thống kê doanh thu, vé xe và hiệu suất từng chuyến xe.</p>
+    </div>
+
+    <!-- 3 TABS -->
+    <div class="c-page-tabs">
+      <button class="c-page-tab is-active" data-tab="pRevenue"><i class="bi bi-cash-stack"></i> Thống kê doanh thu</button>
+      <button class="c-page-tab" data-tab="pTicket"><i class="bi bi-ticket-perforated-fill"></i> Thống kê vé</button>
+      <button class="c-page-tab" data-tab="pTrip"><i class="bi bi-signpost-split-fill"></i> Thống kê theo chuyến xe</button>
+    </div>
+
+    <!-- ═══════════ TAB 1: THỐNG KÊ DOANH THU ═══════════ -->
+    <div class="c-tab-panel is-active" id="pRevenue">
+      <div class="c-filter-bar">
+        <select class="c-filter-select" id="f1Mode"><option value="day">Theo ngày</option><option value="week">Theo tuần</option><option value="month">Theo tháng</option><option value="custom">Khoảng thời gian tùy chọn</option></select>
+        <div class="date-range" id="f1Range"><input type="date" id="f1From"/><span>—</span><input type="date" id="f1To"/></div>
+        <button class="c-btn c-btn--primary" id="btn1"><i class="bi bi-bar-chart-line"></i> Thống kê</button>
+      </div>
+      <div class="kpi-grid kpi-grid--4" id="kpi1"></div>
+      <div class="chart-card"><div class="chart-title"><i class="bi bi-graph-up"></i> Biểu đồ doanh thu</div><canvas id="chart1" height="90"></canvas></div>
+      <div class="c-table-wrapper"><div style="overflow-x:auto"><table class="c-table"><thead><tr><th>Thời gian</th><th style="text-align:center">Số chuyến</th><th style="text-align:center">Số vé</th><th style="text-align:right">Doanh thu</th><th style="text-align:right">Tỷ lệ %</th></tr></thead><tbody id="tb1"></tbody></table></div>
+      <div class="c-pagination"><span id="tb1Sum"></span><div class="c-pagination-nav" id="pg1"></div></div></div>
+    </div>
+
+    <!-- ═══════════ TAB 2: THỐNG KÊ VÉ ═══════════ -->
+    <div class="c-tab-panel" id="pTicket">
+      <div class="c-filter-bar">
+        <select class="c-filter-select" id="f2Mode"><option value="day">Theo ngày</option><option value="week">Theo tuần</option><option value="month">Theo tháng</option><option value="custom">Khoảng thời gian tùy chọn</option></select>
+        <div class="date-range" id="f2Range"><input type="date" id="f2From"/><span>—</span><input type="date" id="f2To"/></div>
+        <button class="c-btn c-btn--primary" id="btn2"><i class="bi bi-bar-chart-line"></i> Thống kê</button>
+      </div>
+      <div class="kpi-grid kpi-grid--3" id="kpi2"></div>
+      <div class="chart-row">
+        <div class="chart-card"><div class="chart-title"><i class="bi bi-bar-chart-fill"></i> Số lượng vé theo trạng thái</div><canvas id="chart2Bar" height="110"></canvas></div>
+        <div class="chart-card"><div class="chart-title"><i class="bi bi-pie-chart-fill"></i> Tỷ lệ trạng thái vé</div><canvas id="chart2Donut" height="110"></canvas></div>
+      </div>
+      <div class="c-table-wrapper"><div style="overflow-x:auto"><table class="c-table"><thead><tr><th>Thời gian</th><th style="text-align:center">Vé đã đặt</th><th style="text-align:center">Vé đã thanh toán</th><th style="text-align:center">Vé đã hủy</th><th style="text-align:right">Tỷ lệ hủy</th></tr></thead><tbody id="tb2"></tbody></table></div></div>
+    </div>
+
+    <!-- ═══════════ TAB 3: THỐNG KÊ THEO CHUYẾN XE ═══════════ -->
+    <div class="c-tab-panel" id="pTrip">
+      <div class="c-filter-bar">
+        <select class="c-filter-select" id="f3Time"><option value="today">Hôm nay</option><option value="week">Tuần này</option><option value="month" selected>Tháng này</option><option value="custom">Tùy chọn</option></select>
+        <div class="date-range" id="f3Range"><input type="date" id="f3From"/><span>—</span><input type="date" id="f3To"/></div>
+        <select class="c-filter-select" id="f3Route"><option value="">Tất cả tuyến đường</option></select>
+        <button class="c-btn c-btn--primary" id="btn3"><i class="bi bi-bar-chart-line"></i> Thống kê</button>
+      </div>
+      <div class="c-table-wrapper"><div style="overflow-x:auto"><table class="c-table" id="tripTable"><thead><tr>
+        <th class="sortable" data-col="id">Mã chuyến <i class="bi bi-chevron-expand" style="font-size:10px"></i></th>
+        <th class="sortable" data-col="route">Tuyến đường <i class="bi bi-chevron-expand" style="font-size:10px"></i></th>
+        <th>Ngày KH</th><th>Giờ KH</th>
+        <th class="sortable" data-col="sold" style="text-align:center">Số vé đã bán <i class="bi bi-chevron-expand" style="font-size:10px"></i></th>
+        <th class="sortable" data-col="revenue" style="text-align:right">Tổng doanh thu <i class="bi bi-chevron-expand" style="font-size:10px"></i></th>
+        <th class="sortable" data-col="fill" style="text-align:center">Tỷ lệ lấp đầy <i class="bi bi-chevron-expand" style="font-size:10px"></i></th>
+      </tr></thead><tbody id="tb3"></tbody></table></div>
+      <div class="c-pagination"><span id="tb3Sum"></span><div class="c-pagination-nav" id="pg3"></div></div></div>
+    </div>
+  </main>
+
+  <!-- Auth guard -->
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+  <script>
+  var R = (function(){
+  'use strict';
+
+  /* ══════════════════════════════════════════
+     DỮ LIỆU MẪU — 30 ngày gần nhất
+     ══════════════════════════════════════════ */
+  /* Sinh ngày */
+  function daysAgo(n){var d=new Date();d.setDate(d.getDate()-n);return d;}
+  function fmtD(d){return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
+  function fmtISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function fmtMoney(n){return Number(n).toLocaleString('vi-VN')+'đ';}
+  function weekLabel(d){var w=Math.ceil(d.getDate()/7);return 'Tuần '+w+'/'+String(d.getMonth()+1).padStart(2,'0');}
+  function monthLabel(d){return 'Tháng '+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
+
+  /* 30 ngày dữ liệu doanh thu */
+  var dailyData=[];
+  for(var i=29;i>=0;i--){
+    var dt=daysAgo(i);
+    var trips=Math.floor(Math.random()*6)+3;  // 3-8 chuyến/ngày
+    var booked=Math.floor(Math.random()*30)+20;  // 20-50 vé đặt
+    var paid=Math.floor(booked*(0.6+Math.random()*0.3));
+    var cancelled=Math.floor(Math.random()*6)+1;
+    if(cancelled>booked-paid)cancelled=booked-paid;
+    var rev=(paid*(120000+Math.floor(Math.random()*250000)));
+    dailyData.push({date:dt,dateStr:fmtD(dt),iso:fmtISO(dt),trips:trips,booked:booked,paid:paid,cancelled:cancelled,revenue:rev});
+  }
+
+  /* 20 chuyến xe mẫu (tab 3) */
+  var ROUTES=['Hà Nội → Hải Phòng','Hà Nội → Đà Nẵng','TP.HCM → Đà Lạt','TP.HCM → Nha Trang','TP.HCM → Cần Thơ','Đà Nẵng → Huế','Hà Nội → Vinh','TP.HCM → Vũng Tàu','Hà Nội → Lào Cai','TP.HCM → Phan Thiết'];
+  var tripData=[];
+  for(var j=0;j<20;j++){
+    var dd=daysAgo(Math.floor(Math.random()*30));
+    var cap=j%3===0?22:(j%3===1?40:45);
+    var sold=Math.floor(cap*(0.5+Math.random()*0.5));
+    var price=100000+Math.floor(Math.random()*350000);
+    tripData.push({id:'CX-'+String(j+1).padStart(3,'0'),route:ROUTES[j%ROUTES.length],date:dd,dateStr:fmtD(dd),dep:String(5+Math.floor(Math.random()*16)).padStart(2,'0')+':'+(['00','30'])[Math.floor(Math.random()*2)],sold:sold,capacity:cap,revenue:sold*price,fill:Math.round(sold/cap*100)});
+  }
+  /* Sắp xếp mặc định theo doanh thu giảm dần */
+  tripData.sort(function(a,b){return b.revenue-a.revenue;});
+
+  /* ══════════════════════════════════════════
+     AGGREGATE HELPERS
+     ══════════════════════════════════════════ */
+  function aggByDay(data){return data.map(function(d){return{label:d.dateStr,trips:d.trips,booked:d.booked,paid:d.paid,cancelled:d.cancelled,revenue:d.revenue};});}
+  function aggByWeek(data){
+    var map={};data.forEach(function(d){var k=weekLabel(d.date);if(!map[k])map[k]={label:k,trips:0,booked:0,paid:0,cancelled:0,revenue:0};var m=map[k];m.trips+=d.trips;m.booked+=d.booked;m.paid+=d.paid;m.cancelled+=d.cancelled;m.revenue+=d.revenue;});
+    return Object.values(map);
+  }
+  function aggByMonth(data){
+    var map={};data.forEach(function(d){var k=monthLabel(d.date);if(!map[k])map[k]={label:k,trips:0,booked:0,paid:0,cancelled:0,revenue:0};var m=map[k];m.trips+=d.trips;m.booked+=d.booked;m.paid+=d.paid;m.cancelled+=d.cancelled;m.revenue+=d.revenue;});
+    return Object.values(map);
+  }
+  function getAgg(mode){
+    if(mode==='week')return aggByWeek(dailyData);
+    if(mode==='month')return aggByMonth(dailyData);
+    return aggByDay(dailyData);
+  }
+
+  /* ══════════════════════════════════════════
+     TAB 1: THỐNG KÊ DOANH THU
+     ══════════════════════════════════════════ */
+  var chart1=null,pg1Cur=1;
+  function renderTab1(){
+    var mode=document.getElementById('f1Mode').value;
+    var agg=getAgg(mode);
+    /* KPI */
+    var totRev=0,totTrips=0,totTickets=0;
+    agg.forEach(function(r){totRev+=r.revenue;totTrips+=r.trips;totTickets+=r.paid;});
+    var avgPerTrip=totTrips?Math.round(totRev/totTrips):0;
+    document.getElementById('kpi1').innerHTML=
+      kpiCard('bi-cash-stack','primary','Tổng doanh thu',fmtMoney(totRev))+
+      kpiCard('bi-signpost-split','info','Số chuyến đã chạy',totTrips)+
+      kpiCard('bi-ticket-perforated','success','Số vé đã bán',totTickets)+
+      kpiCard('bi-calculator','warning','TB mỗi chuyến',fmtMoney(avgPerTrip));
+    /* Chart */
+    var labels=agg.map(function(r){return r.label;});
+    var values=agg.map(function(r){return r.revenue;});
+    if(chart1)chart1.destroy();
+    chart1=new Chart(document.getElementById('chart1'),{type:'line',data:{labels:labels,datasets:[{label:'Doanh thu (VNĐ)',data:values,borderColor:'#1976D2',backgroundColor:'rgba(25,118,210,.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#1976D2'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:function(v){return (v/1000000).toFixed(0)+'tr';}},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+    /* Table */
+    renderRevTable(agg);
+  }
+  function renderRevTable(agg){
+    var rpp=10,tp=Math.max(1,Math.ceil(agg.length/rpp));if(pg1Cur>tp)pg1Cur=tp;
+    var s=(pg1Cur-1)*rpp,page=agg.slice(s,s+rpp);
+    var totRev=0;agg.forEach(function(r){totRev+=r.revenue;});
+    document.getElementById('tb1Sum').textContent=agg.length?(s+1)+'–'+Math.min(s+rpp,agg.length)+' / '+agg.length+' dòng':'0 dòng';
+    document.getElementById('tb1').innerHTML=page.map(function(r){
+      var pct=totRev?((r.revenue/totRev)*100).toFixed(1):0;
+      return '<tr><td><strong>'+r.label+'</strong></td><td style="text-align:center">'+r.trips+'</td><td style="text-align:center">'+r.paid+'</td><td style="text-align:right">'+fmtMoney(r.revenue)+'</td><td style="text-align:right">'+pct+'%</td></tr>';
+    }).join('');
+    renderPag('pg1',pg1Cur,tp,function(p){pg1Cur=p;renderRevTable(agg);});
+  }
+
+  /* ══════════════════════════════════════════
+     TAB 2: THỐNG KÊ VÉ
+     ══════════════════════════════════════════ */
+  var chart2Bar=null,chart2Donut=null;
+  function renderTab2(){
+    var mode=document.getElementById('f2Mode').value;
+    var agg=getAgg(mode);
+    var totBooked=0,totPaid=0,totCancelled=0;
+    agg.forEach(function(r){totBooked+=r.booked;totPaid+=r.paid;totCancelled+=r.cancelled;});
+    document.getElementById('kpi2').innerHTML=
+      kpiCard('bi-ticket-perforated','info','Tổng vé đã đặt',totBooked)+
+      kpiCard('bi-check-circle-fill','success','Vé đã thanh toán',totPaid)+
+      kpiCard('bi-x-circle-fill','danger','Vé đã hủy',totCancelled);
+    /* Bar chart */
+    var labels=agg.map(function(r){return r.label;});
+    if(chart2Bar)chart2Bar.destroy();
+    chart2Bar=new Chart(document.getElementById('chart2Bar'),{type:'bar',data:{labels:labels,datasets:[
+      {label:'Đã đặt',data:agg.map(function(r){return r.booked;}),backgroundColor:'#BBDEFB',borderRadius:4},
+      {label:'Đã TT',data:agg.map(function(r){return r.paid;}),backgroundColor:'#2E7D32',borderRadius:4},
+      {label:'Đã hủy',data:agg.map(function(r){return r.cancelled;}),backgroundColor:'#D32F2F',borderRadius:4},
+    ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:12}}}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+    /* Donut chart */
+    if(chart2Donut)chart2Donut.destroy();
+    chart2Donut=new Chart(document.getElementById('chart2Donut'),{type:'doughnut',data:{labels:['Đã đặt (chưa TT)','Đã thanh toán','Đã hủy'],datasets:[{data:[totBooked-totPaid-totCancelled,totPaid,totCancelled],backgroundColor:['#BBDEFB','#2E7D32','#D32F2F'],borderWidth:0}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:12}}}}}});
+    /* Table */
+    document.getElementById('tb2').innerHTML=agg.map(function(r){
+      var cancelRate=r.booked?((r.cancelled/r.booked)*100).toFixed(1):'0.0';
+      return '<tr><td><strong>'+r.label+'</strong></td><td style="text-align:center">'+r.booked+'</td><td style="text-align:center"><span class="c-badge c-badge--success">'+r.paid+'</span></td><td style="text-align:center"><span class="c-badge c-badge--danger">'+r.cancelled+'</span></td><td style="text-align:right">'+cancelRate+'%</td></tr>';
+    }).join('');
+  }
+
+  /* ══════════════════════════════════════════
+     TAB 3: THỐNG KÊ THEO CHUYẾN XE
+     ══════════════════════════════════════════ */
+  var pg3Cur=1,sortCol='revenue',sortDir=-1;
+  function renderTab3(){
+    var routeFilter=document.getElementById('f3Route').value;
+    var list=tripData.filter(function(t){return !routeFilter||t.route===routeFilter;});
+    /* Sort */
+    list.sort(function(a,b){
+      var va=a[sortCol],vb=b[sortCol];
+      if(typeof va==='string')return va.localeCompare(vb)*sortDir;
+      return (va-vb)*sortDir;
+    });
+    var rpp=10,tp=Math.max(1,Math.ceil(list.length/rpp));if(pg3Cur>tp)pg3Cur=tp;
+    var s=(pg3Cur-1)*rpp,page=list.slice(s,s+rpp);
+    document.getElementById('tb3Sum').textContent=list.length?(s+1)+'–'+Math.min(s+rpp,list.length)+' / '+list.length+' chuyến':'0 chuyến';
+    var b=document.getElementById('tb3');
+    if(!page.length){b.innerHTML='<tr><td colspan="7" class="empty-state"><i class="bi bi-signpost-split"></i>Không có dữ liệu.</td></tr>';renderPag('pg3',0,0,function(){});return;}
+    b.innerHTML=page.map(function(t){
+      var fillClr=t.fill>=80?'var(--clr-success)':t.fill>=50?'var(--clr-warning)':'var(--clr-danger)';
+      return '<tr><td><strong>'+t.id+'</strong></td><td>'+t.route+'</td><td>'+t.dateStr+'</td><td>'+t.dep+'</td><td style="text-align:center">'+t.sold+'/'+t.capacity+'</td><td style="text-align:right;white-space:nowrap">'+fmtMoney(t.revenue)+'</td>'+
+      '<td style="text-align:center"><div style="display:flex;align-items:center;gap:8px;justify-content:center"><div class="fill-bar"><div class="fill-bar-inner" style="width:'+t.fill+'%;background:'+fillClr+'"></div></div><strong style="color:'+fillClr+'">'+t.fill+'%</strong></div></td></tr>';
+    }).join('');
+    renderPag('pg3',pg3Cur,tp,function(p){pg3Cur=p;renderTab3();});
+  }
+
+  /* ══════════════════════════════════════════
+     HELPERS CHUNG
+     ══════════════════════════════════════════ */
+  function kpiCard(icon,color,label,value){
+    return '<div class="kpi-card"><div class="kpi-icon kpi-icon--'+color+'"><i class="bi '+icon+'"></i></div><div><div class="kpi-value">'+value+'</div><div class="kpi-label">'+label+'</div></div></div>';
+  }
+  function renderPag(navId,cur,total,cb){
+    var nav=document.getElementById(navId);if(total<=1){nav.innerHTML='';return;}
+    var h='<button class="c-pagination-btn pg" data-p="'+(cur-1)+'"'+(cur<=1?' disabled':'')+'><i class="bi bi-chevron-left"></i></button>';
+    for(var p=1;p<=total;p++){
+      if(total>7){if(p===1||p===total||(p>=cur-1&&p<=cur+1))h+='<button class="c-pagination-btn pg'+(p===cur?' is-active':'')+'" data-p="'+p+'">'+p+'</button>';else if(p===cur-2||p===cur+2)h+='<span style="padding:0 4px;color:var(--clr-text-secondary)">…</span>';}
+      else h+='<button class="c-pagination-btn pg'+(p===cur?' is-active':'')+'" data-p="'+p+'">'+p+'</button>';
+    }
+    h+='<button class="c-pagination-btn pg" data-p="'+(cur+1)+'"'+(cur>=total?' disabled':'')+'><i class="bi bi-chevron-right"></i></button>';
+    nav.innerHTML=h;
+    nav.querySelectorAll('.pg:not(:disabled)').forEach(function(b){b.addEventListener('click',function(){cb(parseInt(this.dataset.p));});});
+  }
+
+  /* ══════════════════════════════════════════
+     INIT
+     ══════════════════════════════════════════ */
+  function init(){
+    /* Sidebar toggle */
+    var sb=document.getElementById('sidebar'),tg=document.getElementById('sidebarToggle'),ov=document.getElementById('sidebarOverlay');
+    function cls(){sb.classList.remove('is-open');ov.classList.remove('is-visible');document.body.style.overflow='';}
+    tg.addEventListener('click',function(){var o=sb.classList.toggle('is-open');ov.classList.toggle('is-visible',o);document.body.style.overflow=o?'hidden':'';});
+    ov.addEventListener('click',cls);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')cls();});
+    window.addEventListener('resize',function(){if(window.innerWidth>=992)cls();});
+
+    /* Tab switching */
+    document.querySelectorAll('.c-page-tab').forEach(function(tab){
+      tab.addEventListener('click',function(){
+        document.querySelectorAll('.c-page-tab').forEach(function(t){t.classList.remove('is-active');});this.classList.add('is-active');
+        document.querySelectorAll('.c-tab-panel').forEach(function(p){p.classList.remove('is-active');});
+        document.getElementById(this.dataset.tab).classList.add('is-active');
+      });
+    });
+
+    /* Date range toggle — Tab 1 */
+    document.getElementById('f1Mode').addEventListener('change',function(){
+      document.getElementById('f1Range').classList.toggle('is-visible',this.value==='custom');
+    });
+    /* Date range toggle — Tab 2 */
+    document.getElementById('f2Mode').addEventListener('change',function(){
+      document.getElementById('f2Range').classList.toggle('is-visible',this.value==='custom');
+    });
+    /* Date range toggle — Tab 3 */
+    document.getElementById('f3Time').addEventListener('change',function(){
+      document.getElementById('f3Range').classList.toggle('is-visible',this.value==='custom');
+    });
+
+    /* Nút thống kê */
+    document.getElementById('btn1').addEventListener('click',function(){pg1Cur=1;renderTab1();});
+    document.getElementById('btn2').addEventListener('click',renderTab2);
+    document.getElementById('btn3').addEventListener('click',function(){pg3Cur=1;renderTab3();});
+
+    /* Route filter — Tab 3 */
+    var seen={},opts='<option value="">Tất cả tuyến đường</option>';
+    tripData.forEach(function(t){if(!seen[t.route]){seen[t.route]=true;opts+='<option value="'+t.route+'">'+t.route+'</option>';}});
+    document.getElementById('f3Route').innerHTML=opts;
+
+    /* Sort — Tab 3 */
+    document.querySelectorAll('#tripTable th.sortable').forEach(function(th){
+      th.addEventListener('click',function(){
+        var col=this.dataset.col;
+        if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=-1;}
+        pg3Cur=1;renderTab3();
+      });
+    });
+
+    /* Initial render */
+    renderTab1();renderTab2();renderTab3();
+  }
+
+  document.addEventListener('DOMContentLoaded',init);
+  return {};
+  })();
+  </script>
+</body>
+</html>

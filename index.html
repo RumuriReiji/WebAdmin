@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tổng quan — Nhà xe Trác Truyệt</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="assets/css/variables.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/utilities.css" />
+
+  <!-- Dashboard-specific styles -->
+  <style>
+    /* ── KPI grid ── */
+    .dashboard-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1199.98px) {
+      .dashboard-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .dashboard-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Charts row ── */
+    .dashboard-charts-row {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1199.98px) {
+      .dashboard-charts-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-container-line {
+      position: relative;
+      height: 320px;
+    }
+
+    .chart-container-donut {
+      position: relative;
+      height: 280px;
+    }
+
+    /* ── Donut center label ── */
+    .donut-center-label {
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .donut-center-label .num {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--clr-text);
+      display: block;
+      line-height: 1.2;
+    }
+
+    .donut-center-label .txt {
+      font-size: 12px;
+      color: var(--clr-text-secondary);
+    }
+
+    /* ── Greeting time badge ── */
+    .greeting-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--clr-info-light);
+      color: var(--clr-primary);
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===============================================================
+       SIDEBAR
+       =============================================================== -->
+  <aside class="layout-sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="bi bi-bus-front-fill"></i>
+      Nhà xe Trác Truyệt
+    </div>
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-label">Chính</li>
+      <li class="sidebar-nav-item">
+        <a href="index.html" class="is-active"><i class="bi bi-grid-1x2-fill"></i> Tổng quan</a>
+      </li>
+
+      <li class="sidebar-nav-label">Quản lý</li>
+      <li class="sidebar-nav-item">
+        <a href="pages/nhan-vien.html"><i class="bi bi-people-fill"></i> Nhân viên</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="pages/khach-hang.html"><i class="bi bi-person-fill"></i> Khách hàng</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="pages/chuyen-xe.html"><i class="bi bi-signpost-split-fill"></i> Chuyến xe</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="pages/ve-xe.html"><i class="bi bi-ticket-perforated-fill"></i> Vé xe</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="pages/quan-ly-xe.html"><i class="bi bi-truck-front-fill"></i> Xe</a>
+      </li>
+
+      <li class="sidebar-nav-label">Báo cáo</li>
+      <li class="sidebar-nav-item">
+        <a href="pages/doanh-thu.html"><i class="bi bi-graph-up-arrow"></i> Doanh thu</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ===============================================================
+       HEADER
+       =============================================================== -->
+  <header class="layout-header">
+    <div class="header-left">
+      <button class="header-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="header-breadcrumb">
+        <i class="bi bi-house-fill" style="color:var(--clr-primary)"></i>
+        <span>/</span>
+        <span>Tổng quan</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-search">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Tìm kiếm vé, khách hàng, chuyến xe..." />
+      </div>
+      <button class="header-icon-btn" title="Thông báo">
+        <i class="bi bi-bell-fill"></i>
+        <span class="badge-dot"></span>
+      </button>
+      <div class="header-avatar" title="Admin Nguyễn">A</div>
+    </div>
+  </header>
+
+  <!-- ===============================================================
+       MAIN CONTENT
+       =============================================================== -->
+  <main class="layout-main">
+
+    <!-- ── Page Header ── -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Tổng quan</h1>
+        <p class="page-subtitle">Chào mừng trở lại! Dưới đây là tổng quan hoạt động kinh doanh.</p>
+      </div>
+      <div class="greeting-time" id="greetingTime">
+        <i class="bi bi-clock"></i>
+        <span id="currentDateTime"></span>
+      </div>
+    </div>
+
+    <!-- =============================================================
+         1. KPI CARDS
+         ============================================================= -->
+    <section class="dashboard-kpi-grid">
+
+      <!-- Tổng doanh thu -->
+      <div class="c-kpi-card">
+        <div class="c-kpi-icon c-kpi-icon--success">
+          <i class="bi bi-currency-dollar"></i>
+        </div>
+        <div class="c-kpi-body">
+          <div class="c-kpi-label">Tổng doanh thu</div>
+          <div class="c-kpi-value" id="kpiRevenue">—</div>
+          <div class="c-kpi-trend" id="trendRevenue"></div>
+        </div>
+      </div>
+
+      <!-- Tổng vé đã bán -->
+      <div class="c-kpi-card">
+        <div class="c-kpi-icon c-kpi-icon--primary">
+          <i class="bi bi-ticket-perforated-fill"></i>
+        </div>
+        <div class="c-kpi-body">
+          <div class="c-kpi-label">Tổng vé đã bán</div>
+          <div class="c-kpi-value" id="kpiTickets">—</div>
+          <div class="c-kpi-trend" id="trendTickets"></div>
+        </div>
+      </div>
+
+      <!-- Tổng chuyến xe -->
+      <div class="c-kpi-card">
+        <div class="c-kpi-icon c-kpi-icon--warning">
+          <i class="bi bi-signpost-split-fill"></i>
+        </div>
+        <div class="c-kpi-body">
+          <div class="c-kpi-label">Tổng chuyến xe</div>
+          <div class="c-kpi-value" id="kpiTrips">—</div>
+          <div class="c-kpi-trend" id="trendTrips"></div>
+        </div>
+      </div>
+
+      <!-- Tổng khách hàng -->
+      <div class="c-kpi-card">
+        <div class="c-kpi-icon c-kpi-icon--danger">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="c-kpi-body">
+          <div class="c-kpi-label">Tổng khách hàng</div>
+          <div class="c-kpi-value" id="kpiCustomers">—</div>
+          <div class="c-kpi-trend" id="trendCustomers"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =============================================================
+         2. CHARTS ROW
+         ============================================================= -->
+    <section class="dashboard-charts-row">
+
+      <!-- ── Revenue Line Chart ── -->
+      <div class="c-chart-card">
+        <div class="c-chart-card-header">
+          <h3 class="c-chart-card-title">
+            <i class="bi bi-graph-up" style="color:var(--clr-primary)"></i>
+            Biểu đồ Doanh thu
+          </h3>
+          <div class="c-tab-pills">
+            <button class="c-tab-pill is-active js-revenue-tab" data-period="daily">Ngày</button>
+            <button class="c-tab-pill js-revenue-tab" data-period="weekly">Tuần</button>
+            <button class="c-tab-pill js-revenue-tab" data-period="monthly">Tháng</button>
+          </div>
+        </div>
+        <div class="c-chart-card-body">
+          <div class="chart-container-line">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Ticket Status Donut Chart ── -->
+      <div class="c-chart-card">
+        <div class="c-chart-card-header">
+          <h3 class="c-chart-card-title">
+            <i class="bi bi-pie-chart-fill" style="color:var(--clr-warning)"></i>
+            Trạng thái Vé xe
+          </h3>
+        </div>
+        <div class="c-chart-card-body" style="position:relative">
+          <div class="donut-center-label">
+            <span class="num" id="donutCenterTotal">—</span>
+            <span class="txt">Tổng vé</span>
+          </div>
+          <div class="chart-container-donut">
+            <canvas id="ticketDonutChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =============================================================
+         3. RECENT BOOKINGS TABLE
+         ============================================================= -->
+    <section>
+      <div class="c-table-wrapper">
+        <div class="c-table-header">
+          <h3 class="c-table-title">
+            <i class="bi bi-clock-history" style="color:var(--clr-primary)"></i>
+            Lịch sử đặt vé gần đây
+          </h3>
+          <a href="pages/ve-xe.html" class="c-btn c-btn--secondary c-btn--sm">
+            Xem tất cả <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table class="c-table">
+            <thead>
+              <tr>
+                <th>Mã vé</th>
+                <th>Tên khách hàng</th>
+                <th>Chuyến xe</th>
+                <th>Trạng thái</th>
+                <th>Ngày đặt</th>
+                <th style="text-align:center">Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody id="recentBookingsBody">
+              <!-- Rendered by dashboard.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="c-pagination">
+          <div class="c-pagination-info">
+            Hiển thị
+            <select>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+            dòng / trang &nbsp;·&nbsp; Trang 1 / 5 (48 kết quả)
+          </div>
+          <div class="c-pagination-nav">
+            <button class="c-pagination-btn" disabled title="Trang trước">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="c-pagination-btn is-active">1</button>
+            <button class="c-pagination-btn">2</button>
+            <button class="c-pagination-btn">3</button>
+            <span style="padding:0 4px;color:var(--clr-text-secondary)">…</span>
+            <button class="c-pagination-btn">5</button>
+            <button class="c-pagination-btn" title="Trang sau">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Footer ── -->
+    <footer style="text-align:center;padding:32px 0 8px;color:var(--clr-text-secondary);font-size:13px">
+      Nhà xe Trác Truyệt v1.0 &copy; 2026 — Hệ thống Quản lý bán vé xe khách
+    </footer>
+
+  </main>
+
+  <!-- ===============================================================
+       SCRIPTS
+       =============================================================== -->
+  <!-- Chart.js 4.x -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <!-- Auth guard — kiểm tra đăng nhập -->
+  <script src="assets/js/auth.js"></script>
+  <!-- Hệ thống thông báo header -->
+  <script src="assets/js/notifications.js"></script>
+
+  <!-- App scripts -->
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+
+  <!-- Inline: show current date/time -->
+  <script>
+    (function () {
+      function updateClock() {
+        var now = new Date();
+        var h = now.getHours();
+        var greeting = h < 12 ? 'Buổi sáng' : h < 18 ? 'Buổi chiều' : 'Buổi tối';
+        var dateStr = now.toLocaleDateString('vi-VN', {
+          weekday: 'long',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        });
+        var timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        var el = document.getElementById('currentDateTime');
+        if (el) el.textContent = greeting + ' · ' + dateStr + ' · ' + timeStr;
+      }
+      updateClock();
+      setInterval(updateClock, 30000);
+    })();
+  </script>
+</body>
+
+</html>

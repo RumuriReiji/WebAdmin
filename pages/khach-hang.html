@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Khách hàng — Nhà xe Trác Truyệt</title>
+
+  <!-- Google Fonts — Inter (design_system.md §2) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <style>
+    /* =================================================================
+       DESIGN TOKENS  —  design_system.md  §1 Bảng màu, §3 Spacing, §4 Shadow
+       ================================================================= */
+    :root {
+      /* Màu sắc */
+      --clr-primary: #1976D2;
+      --clr-primary-dark: #1565C0;
+      --clr-primary-light: #BBDEFB;
+      --clr-success: #2E7D32;
+      --clr-success-light: #E8F5E9;
+      --clr-warning: #F57C00;
+      --clr-warning-light: #FFF3E0;
+      --clr-danger: #D32F2F;
+      --clr-danger-light: #FFEBEE;
+      --clr-info: #0288D1;
+      --clr-info-light: #E3F2FD;
+      --clr-bg: #F5F5F5;
+      --clr-surface: #FFFFFF;
+      --clr-text: #212121;
+      --clr-text-secondary: #757575;
+      --clr-border: #E0E0E0;
+      --clr-sidebar-bg: #0D47A1;
+      --clr-sidebar-text: #FFFFFF;
+
+      /* Bóng đổ */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, .08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, .10);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, .14);
+
+      /* Bo góc */
+      --radius-sm: 8px;   /* Button, Input */
+      --radius-md: 12px;  /* Card */
+      --radius-lg: 16px;  /* Modal */
+      --radius-pill: 20px;/* Badge */
+
+      /* Font */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      /* Layout */
+      --sidebar-w: 260px;
+      --header-h: 56px;
+    }
+
+    /* =================================================================
+       RESET
+       ================================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      font-size: 14px;
+      color: var(--clr-text);
+      background: var(--clr-bg);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* =================================================================
+       SIDEBAR  —  design_system.md §5.2
+       Chiều rộng 260px, nền #0D47A1, active = rgba trắng + border-left
+       ================================================================= */
+    .layout-sidebar {
+      position: fixed; top: 0; left: 0;
+      width: var(--sidebar-w); height: 100vh;
+      background: var(--clr-sidebar-bg);
+      color: var(--clr-sidebar-text);
+      z-index: 1040;
+      display: flex; flex-direction: column;
+      transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+      overflow-y: auto;
+    }
+    .layout-sidebar::-webkit-scrollbar { width: 4px; }
+    .layout-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 4px; }
+
+    /* Logo / Brand — đồng bộ chiều cao header 56px */
+    .sidebar-brand {
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 20px;
+      font-size: 17px; font-weight: 700; letter-spacing: -.3px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      flex-shrink: 0;
+    }
+    .sidebar-brand i { font-size: 24px; }
+
+    /* Menu */
+    .sidebar-nav { list-style: none; padding: 12px 0; margin: 0; flex: 1; }
+    .sidebar-nav-label {
+      padding: 16px 20px 6px;
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .8px;
+      color: rgba(255,255,255,.4);
+    }
+    .sidebar-nav-item a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 20px;
+      color: rgba(255,255,255,.72);
+      text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all .15s ease;
+    }
+    .sidebar-nav-item a:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .sidebar-nav-item a.is-active { background: rgba(255,255,255,.15); border-left-color: #fff; color: #fff; }
+    .sidebar-nav-item a i { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+
+    /* =================================================================
+       HEADER  —  design_system.md §5.3
+       Chiều cao 56px, nền trắng, shadow-sm
+       ================================================================= */
+    .layout-header {
+      position: fixed; top: 0; left: var(--sidebar-w); right: 0;
+      height: var(--header-h);
+      background: var(--clr-surface);
+      box-shadow: var(--shadow-sm);
+      z-index: 1030;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      transition: left .3s;
+    }
+    .header-left  { display: flex; align-items: center; gap: 12px; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+
+    /* Nút toggle sidebar (ẩn trên desktop) */
+    .header-toggle {
+      display: none; border: none; background: none;
+      font-size: 22px; color: var(--clr-text); cursor: pointer;
+      padding: 4px; border-radius: var(--radius-sm);
+    }
+    .header-toggle:hover { background: var(--clr-bg); }
+
+    /* Breadcrumb */
+    .header-breadcrumb {
+      font-size: 14px; color: var(--clr-text-secondary);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .header-breadcrumb span { color: var(--clr-text); font-weight: 600; }
+
+    /* Search — min-width 240px */
+    .header-search { position: relative; min-width: 260px; }
+    .header-search input {
+      width: 100%; height: 36px;
+      padding: 0 12px 0 36px;
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      font-family: var(--font-family); font-size: 13px;
+      background: var(--clr-bg); color: var(--clr-text);
+      transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .header-search input:focus { outline: none; border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(25,118,210,.15); background: #fff; }
+    .header-search input::placeholder { color: var(--clr-text-secondary); }
+    .header-search > i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--clr-text-secondary); font-size: 15px; pointer-events: none; }
+
+    /* Chuông thông báo */
+    .header-icon-btn {
+      position: relative; border: none; background: none;
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--clr-text-secondary); font-size: 20px;
+      transition: background .15s, color .15s;
+    }
+    .header-icon-btn:hover { background: var(--clr-bg); color: var(--clr-text); }
+    .header-icon-btn .badge-dot {
+      position: absolute; top: 6px; right: 7px;
+      width: 9px; height: 9px;
+      background: var(--clr-danger); border-radius: 50%;
+      border: 2px solid var(--clr-surface);
+    }
+
+    /* Avatar */
+    .header-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--clr-primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px;
+    }
+
+    /* =================================================================
+       MAIN CONTENT
+       ================================================================= */
+    .layout-main {
+      margin-left: var(--sidebar-w);
+      margin-top: var(--header-h);
+      padding: 24px;
+      min-height: calc(100vh - var(--header-h));
+      transition: margin-left .3s;
+    }
+
+    /* Overlay mobile */
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 1035;
+      opacity: 0; transition: opacity .3s;
+    }
+    .sidebar-overlay.is-visible { display: block; opacity: 1; }
+
+    /* =================================================================
+       BUTTONS  —  design_system.md §6.1
+       Height 38/30px, border-radius 8px
+       ================================================================= */
+    .c-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 38px; padding: 0 18px;
+      font-family: var(--font-family); font-size: 14px; font-weight: 500;
+      border-radius: var(--radius-sm); border: none; cursor: pointer;
+      transition: all .15s; text-decoration: none; white-space: nowrap; line-height: 1;
+    }
+    .c-btn:disabled       { opacity: .5; cursor: not-allowed; }
+    .c-btn--primary       { background: var(--clr-primary); color: #fff; }
+    .c-btn--primary:hover:not(:disabled) { background: var(--clr-primary-dark); }
+    .c-btn--secondary     { background: transparent; color: var(--clr-primary); border: 1px solid var(--clr-primary); }
+    .c-btn--secondary:hover:not(:disabled) { background: rgba(25,118,210,.06); }
+    .c-btn--success       { background: var(--clr-success); color: #fff; }
+    .c-btn--success:hover:not(:disabled) { background: #256b29; }
+    .c-btn--danger        { background: var(--clr-danger); color: #fff; }
+    .c-btn--danger:hover:not(:disabled)  { background: #b72626; }
+    .c-btn--ghost         { background: transparent; color: var(--clr-text); }
+    .c-btn--ghost:hover:not(:disabled)   { background: rgba(0,0,0,.04); }
+    .c-btn--warning       { background: var(--clr-warning); color: #fff; }
+    .c-btn--warning:hover:not(:disabled) { background: #e06c00; }
+    .c-btn--sm            { height: 30px; padding: 0 12px; font-size: 13px; }
+    .c-btn--icon          { width: 38px; padding: 0; }
+    .c-btn--icon.c-btn--sm { width: 30px; }
+
+    /* =================================================================
+       INPUTS  —  design_system.md §6.2
+       Height 38px, border-radius 8px, focus ring primary
+       ================================================================= */
+    .c-form-group { margin-bottom: 16px; }
+    .c-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: var(--clr-text); }
+    .c-label .required { color: var(--clr-danger); margin-left: 2px; }
+    .c-input {
+      width: 100%; height: 38px; padding: 0 12px;
+      font-family: var(--font-family); font-size: 14px;
+      color: var(--clr-text); background: #fff;
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .c-input:focus { outline: none; border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(25,118,210,.15); }
+    .c-input::placeholder { color: var(--clr-text-secondary); }
+    .c-input[readonly] { background: var(--clr-bg); color: var(--clr-text-secondary); cursor: default; }
+    .c-input[readonly]:focus { border-color: var(--clr-border); box-shadow: none; }
+
+    /* =================================================================
+       TABLE  —  design_system.md §6.3
+       Header #F5F5F5, uppercase 12px, row hover, cell padding 12×16
+       ================================================================= */
+    .c-table-wrapper { background: var(--clr-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .c-table { width: 100%; border-collapse: collapse; }
+    .c-table thead th {
+      background: #FAFAFA; padding: 12px 16px;
+      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
+      color: var(--clr-text-secondary); text-align: left;
+      border-bottom: 1px solid var(--clr-border); white-space: nowrap;
+    }
+    .c-table tbody td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid var(--clr-border); vertical-align: middle; }
+    .c-table tbody tr:last-child td { border-bottom: none; }
+    .c-table tbody tr { transition: background .1s; }
+    .c-table tbody tr:hover { background: rgba(25,118,210,.03); }
+
+    /* =================================================================
+       PAGINATION  —  design_system.md §6.3 phân trang
+       ================================================================= */
+    .c-pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--clr-border); font-size: 13px; color: var(--clr-text-secondary); flex-wrap: wrap; gap: 8px; }
+    .c-pagination-info { display: flex; align-items: center; gap: 8px; }
+    .c-pagination-info select {
+      height: 30px; padding: 0 28px 0 8px;
+      border: 1px solid var(--clr-border); border-radius: 6px;
+      font-family: var(--font-family); font-size: 13px; cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center; background-color: #fff;
+    }
+    .c-pagination-nav { display: flex; align-items: center; gap: 4px; }
+    .c-pagination-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 32px; height: 32px; padding: 0 8px;
+      border: 1px solid var(--clr-border); border-radius: 6px;
+      background: #fff; color: var(--clr-text);
+      font-family: var(--font-family); font-size: 13px; cursor: pointer;
+      transition: all .15s;
+    }
+    .c-pagination-btn:hover:not(:disabled):not(.is-active) { border-color: var(--clr-primary); color: var(--clr-primary); }
+    .c-pagination-btn.is-active { background: var(--clr-primary); border-color: var(--clr-primary); color: #fff; }
+    .c-pagination-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* =================================================================
+       BADGE  —  design_system.md §6.6
+       Pill 20px, padding 4×12, 12px/500
+       ================================================================= */
+    .c-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .c-badge--success { background: var(--clr-success-light); color: var(--clr-success); }
+    .c-badge--warning { background: var(--clr-warning-light); color: var(--clr-warning); }
+    .c-badge--danger  { background: var(--clr-danger-light);  color: var(--clr-danger); }
+    .c-badge--info    { background: var(--clr-info-light);    color: var(--clr-info); }
+
+    /* =================================================================
+       MODAL  —  design_system.md §6.4
+       Overlay rgba(0,0,0,.5), max-width 560px→720px, radius 16px, animation
+       ================================================================= */
+    .c-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 1050;
+      justify-content: center; align-items: flex-start;
+      padding: 40px 16px; overflow-y: auto;
+    }
+    .c-modal-overlay.is-open { display: flex; animation: mFade .2s ease; }
+    .c-modal {
+      background: var(--clr-surface); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 720px;
+      display: flex; flex-direction: column;
+      animation: mSlide .25s ease;
+    }
+    .c-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--clr-border); }
+    .c-modal-title  { font-size: 18px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .c-modal-close  { border: none; background: none; font-size: 22px; color: var(--clr-text-secondary); cursor: pointer; padding: 4px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+    .c-modal-close:hover { background: var(--clr-bg); color: var(--clr-text); }
+    .c-modal-body   { padding: 24px; overflow-y: auto; max-height: calc(90vh - 140px); }
+    .c-modal-body::-webkit-scrollbar { width: 5px; }
+    .c-modal-body::-webkit-scrollbar-thumb { background: var(--clr-border); border-radius: 5px; }
+    .c-modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--clr-border); }
+    @keyframes mFade  { from { opacity:0; } to { opacity:1; } }
+    @keyframes mSlide { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+    /* =================================================================
+       PAGE-SPECIFIC STYLES
+       ================================================================= */
+    /* Tiêu đề trang */
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .page-title  { font-size: 24px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px; }
+    .page-title i { color: var(--clr-primary); }
+    .page-subtitle { font-size: 14px; color: var(--clr-text-secondary); margin: 2px 0 0; }
+
+    /* Thanh tìm kiếm + bộ lọc */
+    .c-filter-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .c-filter-search { position: relative; flex: 1; min-width: 200px; max-width: 420px; }
+    .c-filter-search input {
+      width: 100%; height: 38px; padding: 0 12px 0 38px;
+      font-family: var(--font-family); font-size: 14px;
+      color: var(--clr-text); background: #fff;
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .c-filter-search input:focus { outline: none; border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(25,118,210,.15); }
+    .c-filter-search input::placeholder { color: var(--clr-text-secondary); }
+    .c-filter-search > i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--clr-text-secondary); font-size: 15px; pointer-events: none; }
+
+    /* Avatar nhỏ trong bảng */
+    .avatar-sm {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0;
+    }
+    .customer-cell { display: flex; align-items: center; gap: 10px; }
+    .email-link { color: var(--clr-primary); text-decoration: none; font-size: 13px; }
+    .email-link:hover { text-decoration: underline; }
+
+    /* Cột "Số vé" dạng pill */
+    .ticket-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 36px; padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--clr-info-light); color: var(--clr-primary);
+      font-size: 13px; font-weight: 600;
+    }
+
+    /* Trạng thái trống */
+    .empty-state { text-align: center; padding: 48px 16px !important; color: var(--clr-text-secondary); }
+    .empty-state i { font-size: 40px; display: block; margin-bottom: 8px; opacity: .3; }
+
+    /* ── Modal tabs (trong chi tiết KH) ── */
+    .modal-tabs {
+      display: flex; gap: 0;
+      border-bottom: 2px solid var(--clr-border);
+      margin: -24px -24px 20px; padding: 0 24px;
+    }
+    .modal-tab {
+      position: relative;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 20px;
+      font-family: var(--font-family); font-size: 14px; font-weight: 500;
+      color: var(--clr-text-secondary); background: none;
+      border: none; cursor: pointer; white-space: nowrap;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: color .15s;
+    }
+    .modal-tab:hover { color: var(--clr-text); }
+    .modal-tab.is-active { color: var(--clr-primary); border-bottom-color: var(--clr-primary); font-weight: 600; }
+    .modal-tab i { font-size: 16px; }
+    .tab-badge { font-size: 11px; padding: 1px 8px; margin-left: 2px; }
+    .modal-tab-panel { display: none; }
+    .modal-tab-panel.is-active { display: block; animation: tabIn .2s ease; }
+    @keyframes tabIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Hồ sơ KH trong modal ── */
+    .profile-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px; background: var(--clr-bg);
+      border-radius: var(--radius-sm); margin-bottom: 20px;
+    }
+    .profile-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .profile-name { font-size: 18px; font-weight: 700; margin: 0; }
+    .profile-meta { font-size: 13px; color: var(--clr-text-secondary); margin-top: 2px; }
+
+    /* ── Form grid 2 cột ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+    .form-grid .full-width { grid-column: 1 / -1; }
+    @media (max-width: 575.98px) { .form-grid { grid-template-columns: 1fr; } }
+
+    /* ── Bảng lịch sử vé (nhỏ hơn bảng chính) ── */
+    .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .history-table thead th {
+      background: #FAFAFA; padding: 10px 12px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
+      color: var(--clr-text-secondary); border-bottom: 1px solid var(--clr-border);
+      white-space: nowrap; text-align: left;
+    }
+    .history-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--clr-border); vertical-align: middle; }
+    .history-table tbody tr:last-child td { border-bottom: none; }
+    .history-table tbody tr:hover { background: rgba(25,118,210,.03); }
+
+    /* ── Toast thông báo ── */
+    .c-toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 1100;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 20px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500; color: #fff;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px); opacity: 0; pointer-events: none;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+    }
+    .c-toast.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .c-toast--success { background: var(--clr-success); }
+    .c-toast--danger  { background: var(--clr-danger); }
+    .c-toast--warning { background: var(--clr-warning); }
+    .c-toast--info    { background: var(--clr-primary); }
+
+    /* =================================================================
+       RESPONSIVE  —  design_system.md §8
+       ================================================================= */
+    @media (max-width: 991.98px) {
+      .layout-sidebar { transform: translateX(-100%); }
+      .layout-sidebar.is-open { transform: translateX(0); }
+      .layout-header { left: 0; }
+      .layout-main { margin-left: 0; }
+      .header-toggle { display: flex; }
+    }
+    @media (max-width: 575.98px) {
+      .header-search { display: none; }
+      .layout-main { padding: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =============================================================
+       SIDEBAR  —  Mục "Khách hàng" được highlight (is-active)
+       ============================================================= -->
+  <aside class="layout-sidebar" id="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-bus-front-fill"></i> Nhà xe Trác Truyệt</div>
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-label">Chính</li>
+      <li class="sidebar-nav-item"><a href="../index.html"><i class="bi bi-grid-1x2-fill"></i> Tổng quan</a></li>
+      <li class="sidebar-nav-label">Quản lý</li>
+      <li class="sidebar-nav-item"><a href="nhan-vien.html"><i class="bi bi-people-fill"></i> Nhân viên</a></li>
+      <li class="sidebar-nav-item"><a href="khach-hang.html" class="is-active"><i class="bi bi-person-fill"></i> Khách hàng</a></li>
+      <li class="sidebar-nav-item"><a href="chuyen-xe.html"><i class="bi bi-signpost-split-fill"></i> Chuyến xe</a></li>
+      <li class="sidebar-nav-item"><a href="ve-xe.html"><i class="bi bi-ticket-perforated-fill"></i> Vé xe</a></li>
+      <li class="sidebar-nav-item"><a href="quan-ly-xe.html"><i class="bi bi-truck-front-fill"></i> Xe</a></li>
+      <li class="sidebar-nav-label">Báo cáo</li>
+      <li class="sidebar-nav-item"><a href="doanh-thu.html"><i class="bi bi-graph-up-arrow"></i> Doanh thu</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- =============================================================
+       HEADER  —  Search, Chuông, Avatar
+       ============================================================= -->
+  <header class="layout-header">
+    <div class="header-left">
+      <button class="header-toggle" id="sidebarToggle" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+      <div class="header-breadcrumb">
+        <i class="bi bi-house-fill" style="color:var(--clr-primary)"></i>
+        <span>/</span> Quản lý <span>/</span> <span>Khách hàng</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-search"><i class="bi bi-search"></i><input type="text" placeholder="Tìm kiếm..." /></div>
+      <button class="header-icon-btn" title="Thông báo"><i class="bi bi-bell-fill"></i><span class="badge-dot"></span></button>
+      <div class="header-avatar" title="Admin Nguyễn">A</div>
+    </div>
+  </header>
+
+  <!-- =============================================================
+       NỘI DUNG CHÍNH
+       ============================================================= -->
+  <main class="layout-main">
+
+    <!-- Tiêu đề trang -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title"><i class="bi bi-person-fill"></i> Quản lý Khách hàng</h1>
+        <p class="page-subtitle">Tra cứu thông tin, lịch sử đặt vé và cập nhật hồ sơ khách hàng.</p>
+      </div>
+    </div>
+
+    <!-- Thanh tìm kiếm — KHÔNG có nút "Thêm KH" (KH tự đăng ký qua App) -->
+    <div class="c-filter-bar">
+      <div class="c-filter-search">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" placeholder="Tìm theo tên, SĐT hoặc email..." />
+      </div>
+      <div style="flex:1"></div>
+      <span id="tableSummary" style="font-size:13px;color:var(--clr-text-secondary)"></span>
+    </div>
+
+    <!-- Bảng danh sách khách hàng -->
+    <div class="c-table-wrapper">
+      <div style="overflow-x:auto">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>Mã KH</th>
+              <th>Họ và tên</th>
+              <th>Số điện thoại</th>
+              <th>Email</th>
+              <th style="text-align:center">Số vé đã đặt</th>
+              <th>Ngày đăng ký</th>
+              <th>Trạng thái</th>
+              <th style="text-align:center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Render bởi JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      <!-- Phân trang 10 dòng/trang -->
+      <div class="c-pagination">
+        <div class="c-pagination-info">
+          Hiển thị
+          <select id="rowsPerPage">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          dòng / trang
+        </div>
+        <div class="c-pagination-nav" id="paginationNav"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =============================================================
+       MODAL: CHI TIẾT KHÁCH HÀNG  —  2 Tabs
+       ============================================================= -->
+  <div class="c-modal-overlay" id="detailModal">
+    <div class="c-modal">
+
+      <!-- Header modal -->
+      <div class="c-modal-header">
+        <h3 class="c-modal-title">
+          <i class="bi bi-person-badge-fill" style="color:var(--clr-primary)"></i>
+          <span id="modalTitle">Chi tiết khách hàng</span>
+        </h3>
+        <button class="c-modal-close" onclick="App.closeModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <!-- Body modal -->
+      <div class="c-modal-body">
+
+        <!-- Hồ sơ tóm tắt -->
+        <div class="profile-header">
+          <div class="profile-avatar" id="modalAvatar">KH</div>
+          <div>
+            <h2 class="profile-name" id="modalName">—</h2>
+            <div class="profile-meta">
+              <span id="modalId">KH-000</span> · Đăng ký <span id="modalJoined">—</span>
+              · <span id="modalStatusInline"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Tabs -->
+        <div class="modal-tabs">
+          <button class="modal-tab is-active" data-tab="tabInfo">
+            <i class="bi bi-person-lines-fill"></i> Thông tin cá nhân
+          </button>
+          <button class="modal-tab" data-tab="tabHistory">
+            <i class="bi bi-clock-history"></i> Lịch sử đặt vé
+            <span class="c-badge c-badge--info tab-badge" id="historyCount">0</span>
+          </button>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             TAB 1: THÔNG TIN CÁ NHÂN
+             ═══════════════════════════════════════════════ -->
+        <div class="modal-tab-panel is-active" id="tabInfo">
+          <div class="form-grid">
+            <!-- Họ tên — readonly (KH tự đăng ký, Admin không sửa) -->
+            <div class="c-form-group">
+              <label class="c-label">Họ và tên</label>
+              <input type="text" class="c-input" id="fldName" readonly />
+            </div>
+            <!-- Ngày sinh — readonly -->
+            <div class="c-form-group">
+              <label class="c-label">Ngày sinh</label>
+              <input type="text" class="c-input" id="fldDob" readonly />
+            </div>
+            <!-- SĐT — Admin ĐƯỢC sửa -->
+            <div class="c-form-group">
+              <label class="c-label">Số điện thoại <span class="required">*</span></label>
+              <input type="tel" class="c-input" id="fldPhone" placeholder="0901 234 567" />
+            </div>
+            <!-- Email — Admin ĐƯỢC sửa -->
+            <div class="c-form-group">
+              <label class="c-label">Email <span class="required">*</span></label>
+              <input type="email" class="c-input" id="fldEmail" placeholder="email@example.com" />
+            </div>
+            <!-- Địa chỉ — Admin ĐƯỢC sửa -->
+            <div class="c-form-group full-width">
+              <label class="c-label">Địa chỉ</label>
+              <input type="text" class="c-input" id="fldAddress" placeholder="Nhập địa chỉ..." />
+            </div>
+            <!-- Ngày đăng ký — readonly -->
+            <div class="c-form-group">
+              <label class="c-label">Ngày đăng ký</label>
+              <input type="text" class="c-input" id="fldJoined" readonly />
+            </div>
+            <!-- Trạng thái tài khoản — readonly, hiển thị dạng text -->
+            <div class="c-form-group">
+              <label class="c-label">Trạng thái tài khoản</label>
+              <input type="text" class="c-input" id="fldStatus" readonly />
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════
+             TAB 2: LỊCH SỬ ĐẶT VÉ
+             ═══════════════════════════════════════════════ -->
+        <div class="modal-tab-panel" id="tabHistory">
+          <div style="overflow-x:auto">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Mã vé</th>
+                  <th>Chuyến xe</th>
+                  <th style="text-align:center">Số ghế</th>
+                  <th>Trạng thái vé</th>
+                  <th>Ngày đặt</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody">
+                <!-- Render bởi JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer modal — thay đổi tuỳ tab -->
+      <div class="c-modal-footer" id="modalFooter">
+        <!-- Nút Khóa/Mở khóa ở bên trái -->
+        <span id="lockBtnSlot" style="margin-right:auto"></span>
+        <button class="c-btn c-btn--ghost" onclick="App.closeModal()">Hủy</button>
+        <button class="c-btn c-btn--primary" id="btnSave"><i class="bi bi-check-lg"></i> Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast thông báo -->
+  <div class="c-toast" id="toast"></div>
+
+  <!-- Auth guard -->
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <!-- =============================================================
+       JAVASCRIPT
+       ============================================================= -->
+  <script>
+  var App = (function () {
+    'use strict';
+
+    /* ==============================================================
+       1. DỮ LIỆU MẪU — 10 khách hàng tiếng Việt
+       ============================================================== */
+    var customers = [
+      { id:'KH-001', name:'Nguyễn Văn An',    phone:'0901 234 567', email:'an.nguyen@gmail.com',   dob:'15/03/1990', address:'12 Trần Phú, Ba Đình, Hà Nội',        joined:'12/01/2026', status:'active' },
+      { id:'KH-002', name:'Trần Thị Bích',    phone:'0912 345 678', email:'bich.tran@gmail.com',   dob:'22/07/1995', address:'45 Nguyễn Huệ, Quận 1, TP.HCM',      joined:'18/02/2026', status:'active' },
+      { id:'KH-003', name:'Lê Hoàng Cường',   phone:'0923 456 789', email:'cuong.le@yahoo.com',    dob:'08/11/1988', address:'78 Lê Lợi, Hải Châu, Đà Nẵng',       joined:'05/03/2026', status:'active' },
+      { id:'KH-004', name:'Phạm Minh Đức',    phone:'0934 567 890', email:'duc.pham@outlook.com',  dob:'30/05/1992', address:'23 Hùng Vương, TP Huế',               joined:'22/03/2026', status:'locked' },
+      { id:'KH-005', name:'Võ Thị Em',        phone:'0945 678 901', email:'em.vo@gmail.com',       dob:'14/09/1997', address:'56 Phan Đình Phùng, Nha Trang',       joined:'10/04/2026', status:'active' },
+      { id:'KH-006', name:'Hoàng Văn Phúc',   phone:'0956 789 012', email:'phuc.hoang@gmail.com',  dob:'03/12/1985', address:'89 Bà Triệu, Hoàn Kiếm, Hà Nội',     joined:'28/04/2026', status:'active' },
+      { id:'KH-007', name:'Đỗ Thị Giang',     phone:'0967 890 123', email:'giang.do@gmail.com',    dob:'19/01/1993', address:'34 Điện Biên Phủ, Quận 3, TP.HCM',   joined:'15/05/2026', status:'active' },
+      { id:'KH-008', name:'Bùi Quang Huy',    phone:'0978 901 234', email:'huy.bui@gmail.com',     dob:'27/06/1991', address:'67 Trưng Trắc, Ninh Kiều, Cần Thơ',  joined:'03/06/2026', status:'locked' },
+      { id:'KH-009', name:'Ngô Thanh Lan',    phone:'0989 012 345', email:'lan.ngo@yahoo.com',     dob:'11/04/1996', address:'90 Lý Thường Kiệt, TP Đà Lạt',       joined:'20/07/2026', status:'active' },
+      { id:'KH-010', name:'Phan Văn Khoa',    phone:'0990 123 456', email:'khoa.phan@gmail.com',   dob:'06/08/1989', address:'15 Nguyễn Trãi, TP Vũng Tàu',         joined:'08/08/2026', status:'active' },
+    ];
+
+    /* DỮ LIỆU MẪU — Mỗi khách hàng 5 vé (tổng 50 vé) */
+    var bookings = [
+      /* ── KH-001: Nguyễn Văn An ── */
+      { cid:'KH-001', tid:'VE-0115-001', trip:'Hà Nội → Hải Phòng',     dep:'06:00', seat:'A3',  status:'paid',      date:'15/01/2026' },
+      { cid:'KH-001', tid:'VE-0302-002', trip:'Hải Phòng → Hà Nội',     dep:'14:30', seat:'B1',  status:'paid',      date:'02/03/2026' },
+      { cid:'KH-001', tid:'VE-0618-003', trip:'Hà Nội → Thanh Hóa',     dep:'07:00', seat:'A5',  status:'paid',      date:'18/06/2026' },
+      { cid:'KH-001', tid:'VE-0820-004', trip:'Hà Nội → Lào Cai',       dep:'19:30', seat:'C2',  status:'confirmed', date:'20/08/2026' },
+      { cid:'KH-001', tid:'VE-1005-005', trip:'Hà Nội → Hải Phòng',     dep:'08:00', seat:'A1',  status:'pending',   date:'05/10/2026' },
+
+      /* ── KH-002: Trần Thị Bích ── */
+      { cid:'KH-002', tid:'VE-0220-006', trip:'TP.HCM → Đà Lạt',        dep:'08:00', seat:'B4',  status:'paid',      date:'20/02/2026' },
+      { cid:'KH-002', tid:'VE-0410-007', trip:'Đà Lạt → TP.HCM',        dep:'13:00', seat:'A2',  status:'paid',      date:'10/04/2026' },
+      { cid:'KH-002', tid:'VE-0715-008', trip:'TP.HCM → Nha Trang',     dep:'20:00', seat:'C1',  status:'cancelled', date:'15/07/2026' },
+      { cid:'KH-002', tid:'VE-0901-009', trip:'TP.HCM → Đà Lạt',        dep:'22:00', seat:'B3',  status:'paid',      date:'01/09/2026' },
+      { cid:'KH-002', tid:'VE-1003-010', trip:'TP.HCM → Cần Thơ',       dep:'09:30', seat:'A6',  status:'confirmed', date:'03/10/2026' },
+
+      /* ── KH-003: Lê Hoàng Cường ── */
+      { cid:'KH-003', tid:'VE-0310-011', trip:'Đà Nẵng → Huế',           dep:'09:00', seat:'A4',  status:'paid',      date:'10/03/2026' },
+      { cid:'KH-003', tid:'VE-0505-012', trip:'Huế → Đà Nẵng',           dep:'15:00', seat:'B2',  status:'paid',      date:'05/05/2026' },
+      { cid:'KH-003', tid:'VE-0720-013', trip:'Đà Nẵng → Quảng Ngãi',    dep:'06:30', seat:'C3',  status:'paid',      date:'20/07/2026' },
+      { cid:'KH-003', tid:'VE-0905-014', trip:'Đà Nẵng → Huế',           dep:'10:30', seat:'A1',  status:'cancelled', date:'05/09/2026' },
+      { cid:'KH-003', tid:'VE-1005-015', trip:'Đà Nẵng → Quảng Ngãi',    dep:'07:00', seat:'B5',  status:'pending',   date:'05/10/2026' },
+
+      /* ── KH-004: Phạm Minh Đức ── */
+      { cid:'KH-004', tid:'VE-0325-016', trip:'Huế → Đà Nẵng',           dep:'11:00', seat:'A3',  status:'paid',      date:'25/03/2026' },
+      { cid:'KH-004', tid:'VE-0601-017', trip:'Hà Nội → Vinh',            dep:'05:30', seat:'C4',  status:'paid',      date:'01/06/2026' },
+      { cid:'KH-004', tid:'VE-0730-018', trip:'Vinh → Hà Nội',            dep:'16:00', seat:'B1',  status:'cancelled', date:'30/07/2026' },
+      { cid:'KH-004', tid:'VE-0912-019', trip:'Hà Nội → Vinh',            dep:'06:00', seat:'A2',  status:'cancelled', date:'12/09/2026' },
+      { cid:'KH-004', tid:'VE-0930-020', trip:'Huế → Đà Nẵng',           dep:'14:00', seat:'B4',  status:'paid',      date:'30/09/2026' },
+
+      /* ── KH-005: Võ Thị Em ── */
+      { cid:'KH-005', tid:'VE-0415-021', trip:'TP.HCM → Nha Trang',      dep:'21:00', seat:'A5',  status:'paid',      date:'15/04/2026' },
+      { cid:'KH-005', tid:'VE-0610-022', trip:'Nha Trang → TP.HCM',      dep:'08:00', seat:'B3',  status:'paid',      date:'10/06/2026' },
+      { cid:'KH-005', tid:'VE-0805-023', trip:'TP.HCM → Nha Trang',      dep:'20:30', seat:'C2',  status:'paid',      date:'05/08/2026' },
+      { cid:'KH-005', tid:'VE-0925-024', trip:'Nha Trang → Đà Lạt',      dep:'10:00', seat:'A4',  status:'confirmed', date:'25/09/2026' },
+      { cid:'KH-005', tid:'VE-1008-025', trip:'TP.HCM → Vũng Tàu',       dep:'07:30', seat:'B1',  status:'pending',   date:'08/10/2026' },
+
+      /* ── KH-006: Hoàng Văn Phúc ── */
+      { cid:'KH-006', tid:'VE-0501-026', trip:'Hà Nội → Thanh Hóa',      dep:'07:00', seat:'A2',  status:'paid',      date:'01/05/2026' },
+      { cid:'KH-006', tid:'VE-0620-027', trip:'Thanh Hóa → Hà Nội',      dep:'15:30', seat:'C1',  status:'paid',      date:'20/06/2026' },
+      { cid:'KH-006', tid:'VE-0815-028', trip:'Hà Nội → Lào Cai',         dep:'19:00', seat:'B5',  status:'paid',      date:'15/08/2026' },
+      { cid:'KH-006', tid:'VE-0920-029', trip:'Lào Cai → Hà Nội',         dep:'06:30', seat:'A3',  status:'paid',      date:'20/09/2026' },
+      { cid:'KH-006', tid:'VE-1004-030', trip:'Hà Nội → Hải Phòng',      dep:'08:00', seat:'C4',  status:'confirmed', date:'04/10/2026' },
+
+      /* ── KH-007: Đỗ Thị Giang ── */
+      { cid:'KH-007', tid:'VE-0520-031', trip:'TP.HCM → Cần Thơ',        dep:'08:30', seat:'B2',  status:'paid',      date:'20/05/2026' },
+      { cid:'KH-007', tid:'VE-0705-032', trip:'Cần Thơ → TP.HCM',        dep:'16:00', seat:'A1',  status:'paid',      date:'05/07/2026' },
+      { cid:'KH-007', tid:'VE-0828-033', trip:'TP.HCM → Đà Lạt',         dep:'22:30', seat:'C3',  status:'paid',      date:'28/08/2026' },
+      { cid:'KH-007', tid:'VE-0930-034', trip:'Đà Lạt → TP.HCM',         dep:'09:00', seat:'B4',  status:'cancelled', date:'30/09/2026' },
+      { cid:'KH-007', tid:'VE-1006-035', trip:'TP.HCM → Cần Thơ',        dep:'07:00', seat:'A5',  status:'pending',   date:'06/10/2026' },
+
+      /* ── KH-008: Bùi Quang Huy ── */
+      { cid:'KH-008', tid:'VE-0605-036', trip:'Cần Thơ → TP.HCM',        dep:'14:00', seat:'A4',  status:'paid',      date:'05/06/2026' },
+      { cid:'KH-008', tid:'VE-0720-037', trip:'TP.HCM → Vũng Tàu',       dep:'10:00', seat:'B1',  status:'paid',      date:'20/07/2026' },
+      { cid:'KH-008', tid:'VE-0901-038', trip:'Vũng Tàu → TP.HCM',       dep:'16:30', seat:'C2',  status:'paid',      date:'01/09/2026' },
+      { cid:'KH-008', tid:'VE-0928-039', trip:'TP.HCM → Cần Thơ',        dep:'08:00', seat:'A3',  status:'cancelled', date:'28/09/2026' },
+      { cid:'KH-008', tid:'VE-1002-040', trip:'TP.HCM → Đà Lạt',         dep:'21:00', seat:'B5',  status:'confirmed', date:'02/10/2026' },
+
+      /* ── KH-009: Ngô Thanh Lan ── */
+      { cid:'KH-009', tid:'VE-0725-041', trip:'Hà Nội → Lào Cai',         dep:'20:00', seat:'C1',  status:'paid',      date:'25/07/2026' },
+      { cid:'KH-009', tid:'VE-0810-042', trip:'Lào Cai → Hà Nội',         dep:'07:00', seat:'A2',  status:'paid',      date:'10/08/2026' },
+      { cid:'KH-009', tid:'VE-0905-043', trip:'Hà Nội → Hải Phòng',      dep:'06:30', seat:'B3',  status:'paid',      date:'05/09/2026' },
+      { cid:'KH-009', tid:'VE-0930-044', trip:'Hải Phòng → Hà Nội',      dep:'15:00', seat:'A4',  status:'paid',      date:'30/09/2026' },
+      { cid:'KH-009', tid:'VE-1005-045', trip:'Hà Nội → Lào Cai',         dep:'19:30', seat:'C5',  status:'pending',   date:'05/10/2026' },
+
+      /* ── KH-010: Phan Văn Khoa ── */
+      { cid:'KH-010', tid:'VE-0812-046', trip:'TP.HCM → Vũng Tàu',       dep:'11:00', seat:'A1',  status:'paid',      date:'12/08/2026' },
+      { cid:'KH-010', tid:'VE-0825-047', trip:'Vũng Tàu → TP.HCM',       dep:'17:00', seat:'B2',  status:'paid',      date:'25/08/2026' },
+      { cid:'KH-010', tid:'VE-0910-048', trip:'TP.HCM → Nha Trang',      dep:'20:00', seat:'C4',  status:'cancelled', date:'10/09/2026' },
+      { cid:'KH-010', tid:'VE-0928-049', trip:'TP.HCM → Vũng Tàu',       dep:'09:00', seat:'A3',  status:'paid',      date:'28/09/2026' },
+      { cid:'KH-010', tid:'VE-1005-050', trip:'TP.HCM → Đà Lạt',         dep:'23:00', seat:'B1',  status:'confirmed', date:'05/10/2026' },
+    ];
+
+    /* Bản đồ trạng thái vé */
+    var TICKET_STATUS = {
+      pending:   { label:'Chờ xác nhận',  cls:'c-badge--warning', icon:'bi-clock-fill' },
+      confirmed: { label:'Đã xác nhận',   cls:'c-badge--info',    icon:'bi-check-circle-fill' },
+      paid:      { label:'Đã thanh toán', cls:'c-badge--success', icon:'bi-check-circle-fill' },
+      cancelled: { label:'Đã hủy',        cls:'c-badge--danger',  icon:'bi-x-circle-fill' },
+    };
+
+    /* Bản đồ trạng thái tài khoản KH */
+    var ACCOUNT_STATUS = {
+      active: { label:'Hoạt động', cls:'c-badge--success', icon:'bi-check-circle-fill' },
+      locked: { label:'Bị khóa',   cls:'c-badge--danger',  icon:'bi-lock-fill' },
+    };
+
+    /* Bảng màu avatar */
+    var COLORS = ['#1976D2','#2E7D32','#F57C00','#D32F2F','#7B1FA2','#0288D1','#00838F','#4E342E','#C62828','#6A1B9A'];
+
+    /* ==============================================================
+       2. HÀM TIỆN ÍCH
+       ============================================================== */
+    /* Lấy danh sách vé của 1 khách hàng */
+    function getBookings(cid) {
+      return bookings.filter(function (b) { return b.cid === cid; });
+    }
+
+    /* Lấy chữ cái đầu để hiển thị avatar */
+    function initials(name) {
+      var p = name.trim().split(/\s+/);
+      return p.length >= 2
+        ? (p[0][0] + p[p.length - 1][0]).toUpperCase()
+        : name.substring(0, 2).toUpperCase();
+    }
+
+    /* Lấy màu avatar theo index */
+    function color(i) { return COLORS[i % COLORS.length]; }
+
+    /* Hiển thị toast thông báo */
+    function toast(msg, type) {
+      var el = document.getElementById('toast');
+      var icons = { success:'bi-check-circle-fill', danger:'bi-x-circle-fill', warning:'bi-exclamation-triangle-fill', info:'bi-info-circle-fill' };
+      el.className = 'c-toast c-toast--' + (type || 'success');
+      el.innerHTML = '<i class="bi ' + (icons[type] || icons.success) + '"></i> ' + msg;
+      el.classList.add('is-visible');
+      clearTimeout(el._t);
+      el._t = setTimeout(function () { el.classList.remove('is-visible'); }, 3000);
+    }
+
+    /* ==============================================================
+       3. BẢNG KHÁCH HÀNG  +  PHÂN TRANG
+       ============================================================== */
+    var searchTerm = '';
+    var currentPage = 1;
+    var rowsPerPage = 10;
+
+    /* Lọc danh sách theo từ khoá tìm kiếm */
+    function filtered() {
+      return customers.filter(function (c) {
+        if (!searchTerm) return true;
+        var q = searchTerm;
+        return c.name.toLowerCase().indexOf(q) !== -1 ||
+          c.phone.replace(/\s/g, '').indexOf(q.replace(/\s/g, '')) !== -1 ||
+          c.email.toLowerCase().indexOf(q) !== -1 ||
+          c.id.toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    /* Render bảng danh sách */
+    function renderTable() {
+      var tbody = document.getElementById('tableBody');
+      var list = filtered();
+      var totalPages = Math.max(1, Math.ceil(list.length / rowsPerPage));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      var start = (currentPage - 1) * rowsPerPage;
+      var page = list.slice(start, start + rowsPerPage);
+
+      /* Cập nhật tóm tắt */
+      document.getElementById('tableSummary').textContent = list.length
+        ? 'Hiển thị ' + (start + 1) + '–' + Math.min(start + rowsPerPage, list.length) + ' / ' + list.length + ' khách hàng'
+        : '0 kết quả';
+
+      /* Trường hợp không có dữ liệu */
+      if (!page.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">' +
+          '<i class="bi bi-person-slash"></i>' +
+          '<span>Không tìm thấy khách hàng nào phù hợp.</span></td></tr>';
+        renderPagination(0, 0);
+        return;
+      }
+
+      /* Render từng dòng */
+      tbody.innerHTML = page.map(function (c) {
+        var idx = customers.indexOf(c);
+        var cnt = getBookings(c.id).length;
+        var st = ACCOUNT_STATUS[c.status] || ACCOUNT_STATUS.active;
+
+        return '<tr>' +
+          '<td><strong>' + c.id + '</strong></td>' +
+          '<td><div class="customer-cell">' +
+            '<span class="avatar-sm" style="background:' + color(idx) + '">' + initials(c.name) + '</span>' +
+            c.name +
+          '</div></td>' +
+          '<td>' + c.phone + '</td>' +
+          '<td><a href="mailto:' + c.email + '" class="email-link">' + c.email + '</a></td>' +
+          '<td style="text-align:center"><span class="ticket-count">' + cnt + '</span></td>' +
+          '<td>' + c.joined + '</td>' +
+          '<td><span class="c-badge ' + st.cls + '"><i class="bi ' + st.icon + '"></i> ' + st.label + '</span></td>' +
+          '<td style="text-align:center;white-space:nowrap">' +
+            '<button class="c-btn c-btn--ghost c-btn--icon c-btn--sm js-view" data-id="' + c.id + '" title="Xem chi tiết"><i class="bi bi-eye"></i></button> ' +
+            '<button class="c-btn c-btn--ghost c-btn--icon c-btn--sm js-edit" data-id="' + c.id + '" title="Cập nhật"><i class="bi bi-pencil"></i></button>' +
+          '</td></tr>';
+      }).join('');
+
+      /* Gắn sự kiện cho nút Xem / Sửa */
+      tbody.querySelectorAll('.js-view').forEach(function (b) {
+        b.addEventListener('click', function () { openDetail(this.dataset.id, 'tabHistory'); });
+      });
+      tbody.querySelectorAll('.js-edit').forEach(function (b) {
+        b.addEventListener('click', function () { openDetail(this.dataset.id, 'tabInfo'); });
+      });
+
+      renderPagination(currentPage, totalPages);
+    }
+
+    /* Render phân trang */
+    function renderPagination(cur, total) {
+      var nav = document.getElementById('paginationNav');
+      if (total <= 1) { nav.innerHTML = ''; return; }
+
+      var h = '';
+      /* Nút Previous */
+      h += '<button class="c-pagination-btn pg" data-p="' + (cur - 1) + '"' + (cur <= 1 ? ' disabled' : '') + '><i class="bi bi-chevron-left"></i></button>';
+
+      /* Số trang */
+      for (var p = 1; p <= total; p++) {
+        if (total > 7) {
+          if (p === 1 || p === total || (p >= cur - 1 && p <= cur + 1)) {
+            h += '<button class="c-pagination-btn pg' + (p === cur ? ' is-active' : '') + '" data-p="' + p + '">' + p + '</button>';
+          } else if (p === cur - 2 || p === cur + 2) {
+            h += '<span style="padding:0 4px;color:var(--clr-text-secondary)">…</span>';
+          }
+        } else {
+          h += '<button class="c-pagination-btn pg' + (p === cur ? ' is-active' : '') + '" data-p="' + p + '">' + p + '</button>';
+        }
+      }
+
+      /* Nút Next */
+      h += '<button class="c-pagination-btn pg" data-p="' + (cur + 1) + '"' + (cur >= total ? ' disabled' : '') + '><i class="bi bi-chevron-right"></i></button>';
+
+      nav.innerHTML = h;
+      nav.querySelectorAll('.pg:not(:disabled)').forEach(function (b) {
+        b.addEventListener('click', function () { currentPage = parseInt(this.dataset.p); renderTable(); });
+      });
+    }
+
+    /* ==============================================================
+       4. MODAL CHI TIẾT KHÁCH HÀNG  —  2 Tabs
+       ============================================================== */
+    var activeId = null;   // Mã KH đang mở modal
+    var activeTab = null;  // Tab đang hiển thị
+
+    /* Mở modal chi tiết */
+    function openDetail(cid, defaultTab) {
+      var c = customers.find(function (x) { return x.id === cid; });
+      if (!c) return;
+      activeId = cid;
+
+      var idx = customers.indexOf(c);
+      var bk = getBookings(cid);
+      var st = ACCOUNT_STATUS[c.status] || ACCOUNT_STATUS.active;
+
+      /* ── Hồ sơ tóm tắt ── */
+      document.getElementById('modalAvatar').style.background = color(idx);
+      document.getElementById('modalAvatar').textContent = initials(c.name);
+      document.getElementById('modalName').textContent = c.name;
+      document.getElementById('modalId').textContent = c.id;
+      document.getElementById('modalJoined').textContent = c.joined;
+      document.getElementById('modalTitle').textContent = c.name;
+      document.getElementById('modalStatusInline').innerHTML =
+        '<span class="c-badge ' + st.cls + '" style="font-size:11px"><i class="bi ' + st.icon + '"></i> ' + st.label + '</span>';
+
+      /* ── Tab 1: Thông tin cá nhân ── */
+      document.getElementById('fldName').value    = c.name;
+      document.getElementById('fldDob').value     = c.dob;
+      document.getElementById('fldPhone').value   = c.phone;
+      document.getElementById('fldEmail').value   = c.email;
+      document.getElementById('fldAddress').value = c.address;
+      document.getElementById('fldJoined').value  = c.joined;
+      document.getElementById('fldStatus').value  = st.label;
+
+      /* Nút Khóa / Mở khóa */
+      var lockSlot = document.getElementById('lockBtnSlot');
+      if (c.status === 'active') {
+        lockSlot.innerHTML = '<button class="c-btn c-btn--warning c-btn--sm" id="btnLockToggle"><i class="bi bi-lock"></i> Khóa tài khoản</button>';
+      } else {
+        lockSlot.innerHTML = '<button class="c-btn c-btn--success c-btn--sm" id="btnLockToggle"><i class="bi bi-unlock"></i> Mở khóa</button>';
+      }
+      document.getElementById('btnLockToggle').addEventListener('click', toggleLock);
+
+      /* ── Tab 2: Lịch sử đặt vé ── */
+      document.getElementById('historyCount').textContent = bk.length;
+      var hb = document.getElementById('historyBody');
+      if (!bk.length) {
+        hb.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="bi bi-ticket-perforated"></i><span>Chưa có lịch sử đặt vé.</span></td></tr>';
+      } else {
+        hb.innerHTML = bk.map(function (b) {
+          var s = TICKET_STATUS[b.status] || TICKET_STATUS.pending;
+          return '<tr>' +
+            '<td><strong>' + b.tid + '</strong></td>' +
+            '<td>' + b.trip + ' · <span style="color:var(--clr-text-secondary)">' + b.dep + '</span></td>' +
+            '<td style="text-align:center">' + b.seat + '</td>' +
+            '<td><span class="c-badge ' + s.cls + '"><i class="bi ' + s.icon + '"></i> ' + s.label + '</span></td>' +
+            '<td>' + b.date + '</td></tr>';
+        }).join('');
+      }
+
+      /* Chuyển sang tab mặc định */
+      switchTab(defaultTab || 'tabInfo');
+
+      /* Hiện modal */
+      openModal();
+    }
+
+    /* Chuyển tab trong modal */
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.modal-tab').forEach(function (t) { t.classList.toggle('is-active', t.dataset.tab === tabId); });
+      document.querySelectorAll('.modal-tab-panel').forEach(function (p) { p.classList.toggle('is-active', p.id === tabId); });
+
+      /* Tab "Thông tin cá nhân" → hiện footer (Lưu/Hủy/Khóa);  Tab "Lịch sử" → ẩn footer */
+      document.getElementById('modalFooter').style.display = (tabId === 'tabInfo') ? 'flex' : 'none';
+    }
+
+    /* ==============================================================
+       5. LƯU THAY ĐỔI  (chỉ SĐT, Email, Địa chỉ)
+       ============================================================== */
+    function saveEdit() {
+      if (!activeId) return;
+      var c = customers.find(function (x) { return x.id === activeId; });
+      if (!c) return;
+
+      var phone   = document.getElementById('fldPhone').value.trim();
+      var email   = document.getElementById('fldEmail').value.trim();
+      var address = document.getElementById('fldAddress').value.trim();
+
+      /* Validate cơ bản */
+      if (!phone) { toast('Vui lòng nhập số điện thoại.', 'warning'); return; }
+      if (!email) { toast('Vui lòng nhập email.', 'warning'); return; }
+
+      /* Cập nhật dữ liệu */
+      c.phone   = phone;
+      c.email   = email;
+      c.address = address;
+
+      closeModal();
+      renderTable();
+      toast('Đã cập nhật thông tin ' + c.name + ' thành công!', 'success');
+    }
+
+    /* ==============================================================
+       6. KHÓA / MỞ KHÓA TÀI KHOẢN
+       ============================================================== */
+    function toggleLock() {
+      if (!activeId) return;
+      var c = customers.find(function (x) { return x.id === activeId; });
+      if (!c) return;
+
+      var wasActive = (c.status === 'active');
+      c.status = wasActive ? 'locked' : 'active';
+
+      closeModal();
+      renderTable();
+      toast(
+        wasActive
+          ? 'Đã khóa tài khoản ' + c.name + '.'
+          : 'Đã mở khóa tài khoản ' + c.name + '.',
+        wasActive ? 'danger' : 'success'
+      );
+    }
+
+    /* ==============================================================
+       7. MỞ / ĐÓNG MODAL
+       ============================================================== */
+    function openModal() {
+      document.getElementById('detailModal').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    /* ==============================================================
+       8. SIDEBAR TOGGLE  (responsive)
+       ============================================================== */
+    function initSidebar() {
+      var sidebar = document.getElementById('sidebar');
+      var toggle  = document.getElementById('sidebarToggle');
+      var overlay = document.getElementById('sidebarOverlay');
+      if (!toggle) return;
+
+      function close() {
+        sidebar.classList.remove('is-open');
+        overlay.classList.remove('is-visible');
+        document.body.style.overflow = '';
+      }
+
+      toggle.addEventListener('click', function () {
+        var open = sidebar.classList.toggle('is-open');
+        overlay.classList.toggle('is-visible', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+
+      overlay.addEventListener('click', close);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+      window.addEventListener('resize', function () { if (window.innerWidth >= 992) close(); });
+    }
+
+    /* ==============================================================
+       9. KHỞI TẠO
+       ============================================================== */
+    document.addEventListener('DOMContentLoaded', function () {
+      initSidebar();
+      renderTable();
+
+      /* Tìm kiếm realtime */
+      document.getElementById('searchInput').addEventListener('input', function () {
+        searchTerm = this.value.toLowerCase().trim();
+        currentPage = 1;
+        renderTable();
+      });
+
+      /* Thay đổi số dòng/trang */
+      document.getElementById('rowsPerPage').addEventListener('change', function () {
+        rowsPerPage = parseInt(this.value);
+        currentPage = 1;
+        renderTable();
+      });
+
+      /* Chuyển tab trong modal */
+      document.querySelectorAll('.modal-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () { switchTab(this.dataset.tab); });
+      });
+
+      /* Đóng modal khi click overlay */
+      document.getElementById('detailModal').addEventListener('click', function (e) {
+        if (e.target === this) closeModal();
+      });
+
+      /* Đóng modal bằng Escape */
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+      });
+
+      /* Nút Lưu */
+      document.getElementById('btnSave').addEventListener('click', saveEdit);
+    });
+
+    /* ==============================================================
+       10. PUBLIC API  (cho onclick inline)
+       ============================================================== */
+    return { closeModal: closeModal };
+  })();
+  </script>
+
+</body>
+</html>

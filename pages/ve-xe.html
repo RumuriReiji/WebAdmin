@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Quản lý Vé xe — Nhà xe Trác Truyệt</title>
+
+  <!-- Google Fonts — Inter (design_system.md §2) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       DESIGN TOKENS  —  design_system.md §1 Bảng màu · §3 Spacing · §4 Shadow
+       ═══════════════════════════════════════════════════════════════════ */
+    :root {
+      /* Màu chủ đạo */
+      --clr-primary: #1976D2;
+      --clr-primary-dark: #1565C0;
+      --clr-primary-light: #BBDEFB;
+      /* Màu ngữ nghĩa */
+      --clr-success: #2E7D32;
+      --clr-success-light: #E8F5E9;
+      --clr-warning: #F57C00;
+      --clr-warning-light: #FFF3E0;
+      --clr-danger: #D32F2F;
+      --clr-danger-light: #FFEBEE;
+      --clr-info: #0288D1;
+      --clr-info-light: #E3F2FD;
+      /* Màu nền / bề mặt */
+      --clr-bg: #F5F5F5;
+      --clr-surface: #FFFFFF;
+      --clr-text: #212121;
+      --clr-text-secondary: #757575;
+      --clr-border: #E0E0E0;
+      /* Sidebar */
+      --clr-sidebar-bg: #0D47A1;
+      --clr-sidebar-text: #FFFFFF;
+      /* Bóng đổ */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, .08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, .10);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, .14);
+      /* Bo góc */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 20px;
+      /* Font */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      /* Layout */
+      --sidebar-w: 260px;
+      --header-h: 56px;
+    }
+
+    /* ═══════════════ RESET ═══════════════ */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      font-size: 14px;
+      color: var(--clr-text);
+      background: var(--clr-bg);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ═══════════════ SIDEBAR  (design_system.md §5.2) ═══════════════ */
+    .layout-sidebar {
+      position: fixed; top: 0; left: 0;
+      width: var(--sidebar-w); height: 100vh;
+      background: var(--clr-sidebar-bg); color: var(--clr-sidebar-text);
+      z-index: 1040; display: flex; flex-direction: column;
+      transition: transform .3s cubic-bezier(.4,0,.2,1); overflow-y: auto;
+    }
+    .layout-sidebar::-webkit-scrollbar { width: 4px; }
+    .layout-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 4px; }
+    .sidebar-brand {
+      height: var(--header-h); display: flex; align-items: center; gap: 10px;
+      padding: 0 20px; font-size: 17px; font-weight: 700; letter-spacing: -.3px;
+      border-bottom: 1px solid rgba(255,255,255,.12); flex-shrink: 0;
+    }
+    .sidebar-brand i { font-size: 24px; }
+    .sidebar-nav { list-style: none; padding: 12px 0; margin: 0; flex: 1; }
+    .sidebar-nav-label {
+      padding: 16px 20px 6px; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .8px; color: rgba(255,255,255,.4);
+    }
+    .sidebar-nav-item a {
+      display: flex; align-items: center; gap: 12px; padding: 10px 20px;
+      color: rgba(255,255,255,.72); text-decoration: none;
+      font-size: 14px; font-weight: 500; border-left: 3px solid transparent;
+      transition: all .15s;
+    }
+    .sidebar-nav-item a:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .sidebar-nav-item a.is-active { background: rgba(255,255,255,.15); border-left-color: #fff; color: #fff; }
+    .sidebar-nav-item a i { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+
+    /* ═══════════════ HEADER  (design_system.md §5.3) ═══════════════ */
+    .layout-header {
+      position: fixed; top: 0; left: var(--sidebar-w); right: 0;
+      height: var(--header-h); background: var(--clr-surface);
+      box-shadow: var(--shadow-sm); z-index: 1030;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; transition: left .3s;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-toggle {
+      display: none; border: none; background: none; font-size: 22px;
+      color: var(--clr-text); cursor: pointer; padding: 4px; border-radius: var(--radius-sm);
+    }
+    .header-toggle:hover { background: var(--clr-bg); }
+    .header-breadcrumb {
+      font-size: 14px; color: var(--clr-text-secondary);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .header-breadcrumb span { color: var(--clr-text); font-weight: 600; }
+    .header-search { position: relative; min-width: 260px; }
+    .header-search input {
+      width: 100%; height: 36px; padding: 0 12px 0 36px;
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      font-family: var(--font-family); font-size: 13px;
+      background: var(--clr-bg); color: var(--clr-text);
+      transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .header-search input:focus { outline: none; border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(25,118,210,.15); background: #fff; }
+    .header-search input::placeholder { color: var(--clr-text-secondary); }
+    .header-search > i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--clr-text-secondary); font-size: 15px; pointer-events: none; }
+    .header-icon-btn {
+      position: relative; border: none; background: none; width: 38px; height: 38px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--clr-text-secondary); font-size: 20px;
+      transition: background .15s, color .15s;
+    }
+    .header-icon-btn:hover { background: var(--clr-bg); color: var(--clr-text); }
+    .header-icon-btn .badge-dot {
+      position: absolute; top: 6px; right: 7px; width: 9px; height: 9px;
+      background: var(--clr-danger); border-radius: 50%; border: 2px solid var(--clr-surface);
+    }
+    .header-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--clr-primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 600; cursor: pointer; margin-left: 4px;
+    }
+
+    /* ═══════════════ MAIN ═══════════════ */
+    .layout-main {
+      margin-left: var(--sidebar-w); margin-top: var(--header-h);
+      padding: 24px; min-height: calc(100vh - var(--header-h));
+      transition: margin-left .3s;
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 1035; opacity: 0; transition: opacity .3s;
+    }
+    .sidebar-overlay.is-visible { display: block; opacity: 1; }
+
+    /* ═══════════════ COMPONENTS  (design_system.md §6) ═══════════════ */
+    /* ---- Buttons (§6.1) ---- */
+    .c-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 38px; padding: 0 18px; font-family: var(--font-family);
+      font-size: 14px; font-weight: 500; border-radius: var(--radius-sm);
+      border: none; cursor: pointer; transition: all .15s;
+      text-decoration: none; white-space: nowrap; line-height: 1;
+    }
+    .c-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .c-btn--primary { background: var(--clr-primary); color: #fff; }
+    .c-btn--primary:hover:not(:disabled) { background: var(--clr-primary-dark); }
+    .c-btn--secondary { background: transparent; color: var(--clr-primary); border: 1px solid var(--clr-primary); }
+    .c-btn--secondary:hover:not(:disabled) { background: rgba(25,118,210,.06); }
+    .c-btn--danger { background: var(--clr-danger); color: #fff; }
+    .c-btn--danger:hover:not(:disabled) { background: #b72626; }
+    .c-btn--ghost { background: transparent; color: var(--clr-text); }
+    .c-btn--ghost:hover:not(:disabled) { background: rgba(0,0,0,.04); }
+    .c-btn--sm { height: 30px; padding: 0 12px; font-size: 13px; }
+    .c-btn--icon { width: 38px; padding: 0; }
+    .c-btn--icon.c-btn--sm { width: 30px; }
+
+    /* ---- Inputs (§6.2) ---- */
+    .c-input {
+      width: 100%; height: 38px; padding: 0 12px;
+      font-family: var(--font-family); font-size: 14px;
+      color: var(--clr-text); background: #fff;
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .c-input:focus { outline: none; border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(25,118,210,.15); }
+    .c-input::placeholder { color: var(--clr-text-secondary); }
+    textarea.c-input { height: auto; padding: 10px 12px; resize: vertical; }
+    .c-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 36px; cursor: pointer;
+    }
+    .c-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; color: var(--clr-text); }
+    .c-label .req { color: var(--clr-danger); }
+
+    /* ---- Table (§6.3) ---- */
+    .c-table-wrapper { background: var(--clr-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .c-table { width: 100%; border-collapse: collapse; }
+    .c-table thead th {
+      background: #FAFAFA; padding: 10px 14px;
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .4px; color: var(--clr-text-secondary);
+      text-align: left; border-bottom: 1px solid var(--clr-border); white-space: nowrap;
+    }
+    .c-table tbody td {
+      padding: 10px 14px; font-size: 14px;
+      border-bottom: 1px solid var(--clr-border); vertical-align: middle;
+    }
+    .c-table tbody tr:last-child td { border-bottom: none; }
+    .c-table tbody tr { transition: background .1s; }
+    .c-table tbody tr:hover { background: rgba(25,118,210,.03); }
+
+    /* ---- Badge (§6.6) ---- */
+    .c-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: var(--radius-pill);
+      font-size: 12px; font-weight: 500; white-space: nowrap;
+    }
+    .c-badge--success { background: var(--clr-success-light); color: var(--clr-success); }
+    .c-badge--warning { background: var(--clr-warning-light); color: var(--clr-warning); }
+    .c-badge--danger  { background: var(--clr-danger-light);  color: var(--clr-danger); }
+    .c-badge--info    { background: var(--clr-info-light);    color: var(--clr-info); }
+    .c-badge--secondary { background: #ECEFF1; color: #546E7A; }
+
+    /* ---- Pagination (§6.3) ---- */
+    .c-pagination {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-top: 1px solid var(--clr-border);
+      font-size: 13px; color: var(--clr-text-secondary); flex-wrap: wrap; gap: 8px;
+    }
+    .c-pagination-info { display: flex; align-items: center; gap: 8px; }
+    .c-pagination-info select {
+      height: 30px; padding: 0 28px 0 8px;
+      border: 1px solid var(--clr-border); border-radius: 6px;
+      font-family: var(--font-family); font-size: 13px; cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center; background-color: #fff;
+    }
+    .c-pagination-nav { display: flex; align-items: center; gap: 4px; }
+    .c-pagination-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 32px; height: 32px; padding: 0 8px;
+      border: 1px solid var(--clr-border); border-radius: 6px;
+      background: #fff; color: var(--clr-text);
+      font-family: var(--font-family); font-size: 13px;
+      cursor: pointer; transition: all .15s;
+    }
+    .c-pagination-btn:hover:not(:disabled):not(.is-active) { border-color: var(--clr-primary); color: var(--clr-primary); }
+    .c-pagination-btn.is-active { background: var(--clr-primary); border-color: var(--clr-primary); color: #fff; }
+    .c-pagination-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ---- Modal (§6.4) ---- */
+    .c-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 1050;
+      justify-content: center; align-items: flex-start;
+      padding: 40px 16px; overflow-y: auto;
+    }
+    .c-modal-overlay.is-open { display: flex; animation: fadeIn .2s ease; }
+    .c-modal {
+      background: var(--clr-surface); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 700px;
+      display: flex; flex-direction: column;
+      animation: slideUp .25s ease;
+    }
+    .c-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px; border-bottom: 1px solid var(--clr-border);
+    }
+    .c-modal-title { font-size: 18px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .c-modal-close {
+      border: none; background: none; font-size: 22px;
+      color: var(--clr-text-secondary); cursor: pointer; padding: 4px;
+      border-radius: 6px; display: flex; align-items: center;
+      justify-content: center; transition: background .15s;
+    }
+    .c-modal-close:hover { background: var(--clr-bg); color: var(--clr-text); }
+    .c-modal-body { padding: 24px; overflow-y: auto; max-height: calc(90vh - 140px); }
+    .c-modal-body::-webkit-scrollbar { width: 5px; }
+    .c-modal-body::-webkit-scrollbar-thumb { background: var(--clr-border); border-radius: 5px; }
+    .c-modal-footer {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 8px; padding: 16px 24px; border-top: 1px solid var(--clr-border);
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ═══════════════ PAGE-SPECIFIC ═══════════════ */
+    /* Tiêu đề trang */
+    .page-header { margin-bottom: 24px; }
+    .page-title { font-size: 24px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px; }
+    .page-title i { color: var(--clr-primary); }
+    .page-subtitle { font-size: 14px; color: var(--clr-text-secondary); margin: 2px 0 0; }
+
+    /* Thanh công cụ lọc */
+    .c-filter-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .c-filter-search { position: relative; flex: 1; min-width: 200px; max-width: 340px; }
+    .c-filter-search input {
+      width: 100%; height: 38px; padding: 0 12px 0 38px;
+      font-family: var(--font-family); font-size: 14px;
+      color: var(--clr-text); background: #fff;
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .c-filter-search input:focus { outline: none; border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(25,118,210,.15); }
+    .c-filter-search input::placeholder { color: var(--clr-text-secondary); }
+    .c-filter-search > i {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--clr-text-secondary); font-size: 15px; pointer-events: none;
+    }
+    .c-filter-select {
+      height: 38px; padding: 0 36px 0 12px;
+      font-family: var(--font-family); font-size: 14px;
+      color: var(--clr-text); background: #fff;
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      transition: border-color .15s;
+    }
+    .c-filter-select:focus { outline: none; border-color: var(--clr-primary); }
+
+    /* Hiển thị 2 dòng trong ô bảng */
+    .cell-main { font-weight: 500; color: var(--clr-text); }
+    .cell-sub  { font-size: 12px; color: var(--clr-text-secondary); margin-top: 1px; }
+
+    /* Trạng thái trống */
+    .empty-state { text-align: center; padding: 48px 16px !important; color: var(--clr-text-secondary); }
+    .empty-state i { font-size: 40px; display: block; margin-bottom: 8px; opacity: .3; }
+
+    /* 3 khu vực trong modal chi tiết */
+    .detail-section { margin-bottom: 20px; }
+    .detail-section:last-child { margin-bottom: 0; }
+    .detail-section-title {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--clr-primary);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+      padding-bottom: 8px; border-bottom: 1px solid var(--clr-border);
+    }
+    .detail-section-title i { font-size: 16px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
+    .detail-item-label { font-size: 12px; color: var(--clr-text-secondary); margin-bottom: 2px; }
+    .detail-item-value { font-size: 14px; font-weight: 500; color: var(--clr-text); }
+
+    /* Modal xác nhận nhỏ */
+    .confirm-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 16px;
+    }
+    .confirm-icon--primary { background: var(--clr-info-light); color: var(--clr-primary); }
+    .confirm-icon--danger  { background: var(--clr-danger-light); color: var(--clr-danger); }
+    .confirm-text { text-align: center; font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    .confirm-sub  { text-align: center; font-size: 13px; color: var(--clr-text-secondary); }
+
+    /* Toast thông báo */
+    .c-toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 1100;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 20px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500; color: #fff;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px); opacity: 0; pointer-events: none;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+    }
+    .c-toast.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .c-toast--success { background: var(--clr-success); }
+    .c-toast--danger  { background: var(--clr-danger); }
+    .c-toast--warning { background: var(--clr-warning); }
+    .c-toast--info    { background: var(--clr-primary); }
+
+    /* ═══════════════ RESPONSIVE  (design_system.md §8) ═══════════════ */
+    @media (max-width: 991.98px) {
+      .layout-sidebar { transform: translateX(-100%); }
+      .layout-sidebar.is-open { transform: translateX(0); }
+      .layout-header { left: 0; }
+      .layout-main { margin-left: 0; }
+      .header-toggle { display: flex; }
+    }
+    @media (max-width: 767.98px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 575.98px) {
+      .header-search { display: none; }
+      .layout-main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       SIDEBAR — Mục "Vé xe" được highlight
+       ═══════════════════════════════════════════ -->
+  <aside class="layout-sidebar" id="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-bus-front-fill"></i> Nhà xe Trác Truyệt</div>
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-label">Chính</li>
+      <li class="sidebar-nav-item"><a href="../index.html"><i class="bi bi-grid-1x2-fill"></i> Tổng quan</a></li>
+      <li class="sidebar-nav-label">Quản lý</li>
+      <li class="sidebar-nav-item"><a href="nhan-vien.html"><i class="bi bi-people-fill"></i> Nhân viên</a></li>
+      <li class="sidebar-nav-item"><a href="khach-hang.html"><i class="bi bi-person-fill"></i> Khách hàng</a></li>
+      <li class="sidebar-nav-item"><a href="chuyen-xe.html"><i class="bi bi-signpost-split-fill"></i> Chuyến xe</a></li>
+      <li class="sidebar-nav-item"><a href="ve-xe.html" class="is-active"><i class="bi bi-ticket-perforated-fill"></i> Vé xe</a></li>
+      <li class="sidebar-nav-item"><a href="quan-ly-xe.html"><i class="bi bi-truck-front-fill"></i> Xe</a></li>
+      <li class="sidebar-nav-label">Báo cáo</li>
+      <li class="sidebar-nav-item"><a href="doanh-thu.html"><i class="bi bi-graph-up-arrow"></i> Doanh thu</a></li>
+    </ul>
+  </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ═══════════════════════════════════════════
+       HEADER — Search, Chuông, Avatar
+       ═══════════════════════════════════════════ -->
+  <header class="layout-header">
+    <div class="header-left">
+      <button class="header-toggle" id="sidebarToggle" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+      <div class="header-breadcrumb">
+        <i class="bi bi-house-fill" style="color:var(--clr-primary)"></i>
+        <span>/</span> Quản lý <span>/</span> <span>Vé xe</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-search"><i class="bi bi-search"></i><input type="text" placeholder="Tìm kiếm..."/></div>
+      <button class="header-icon-btn" title="Thông báo"><i class="bi bi-bell-fill"></i><span class="badge-dot"></span></button>
+      <div class="header-avatar" title="Admin">A</div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       NỘI DUNG CHÍNH
+       ═══════════════════════════════════════════ -->
+  <main class="layout-main">
+
+    <!-- Tiêu đề trang -->
+    <div class="page-header">
+      <h1 class="page-title"><i class="bi bi-ticket-perforated-fill"></i> Quản lý Vé xe</h1>
+      <p class="page-subtitle">Xem danh sách, kiểm tra trạng thái và hủy vé xe.</p>
+    </div>
+
+    <!-- Thanh công cụ: Tìm kiếm + Lọc trạng thái + Lọc chuyến + Xuất Excel -->
+    <div class="c-filter-bar">
+      <div class="c-filter-search">
+        <i class="bi bi-search"></i>
+        <input type="text" id="fSearch" placeholder="Tìm mã vé, tên KH, SĐT..."/>
+      </div>
+      <select class="c-filter-select" id="fStatus">
+        <option value="">Tất cả trạng thái</option>
+        <option value="holding">Đang giữ chỗ</option>
+        <option value="pending">Chờ thanh toán</option>
+        <option value="confirmed">Đã xác nhận</option>
+        <option value="paid">Đã thanh toán</option>
+        <option value="cancelled">Đã hủy</option>
+      </select>
+      <select class="c-filter-select" id="fTrip">
+        <option value="">Tất cả chuyến xe</option>
+        <!-- Được render bởi JS -->
+      </select>
+
+    </div>
+
+    <!-- Bảng vé xe -->
+    <div class="c-table-wrapper">
+      <div style="overflow-x:auto">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>Mã vé</th>
+              <th>Khách hàng</th>
+              <th>Chuyến xe</th>
+              <th style="text-align:center">Số ghế</th>
+              <th style="text-align:right">Tổng tiền</th>
+              <th>Ngày đặt</th>
+              <th>Trạng thái</th>
+              <th style="text-align:center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="tBody">
+            <!-- Render bởi JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Phân trang 10 dòng/trang -->
+      <div class="c-pagination">
+        <div class="c-pagination-info">
+          Hiển thị
+          <select id="rpp">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          dòng / trang · <span id="tSummary"></span>
+        </div>
+        <div class="c-pagination-nav" id="pNav"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════
+       MODAL 1: CHI TIẾT VÉ  (3 khu vực)
+       ═══════════════════════════════════════════ -->
+  <div class="c-modal-overlay" id="mDetail">
+    <div class="c-modal">
+      <div class="c-modal-header">
+        <h3 class="c-modal-title">
+          <i class="bi bi-ticket-perforated-fill" style="color:var(--clr-primary)"></i>
+          <span id="detTitle">Chi tiết vé</span>
+        </h3>
+        <button class="c-modal-close" onclick="App.close('mDetail')"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="c-modal-body">
+        <!-- Khu vực 1: Thông tin khách hàng -->
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="bi bi-person-fill"></i> Thông tin khách hàng</div>
+          <div class="detail-grid" id="detCust"></div>
+        </div>
+        <!-- Khu vực 2: Thông tin chuyến xe -->
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="bi bi-signpost-split-fill"></i> Thông tin chuyến xe</div>
+          <div class="detail-grid" id="detTrip"></div>
+        </div>
+        <!-- Khu vực 3: Thông tin vé -->
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="bi bi-ticket-perforated"></i> Thông tin vé</div>
+          <div class="detail-grid" id="detTicket"></div>
+        </div>
+      </div>
+      <div class="c-modal-footer" id="detFooter">
+        <!-- Nút động tuỳ trạng thái — render bởi JS -->
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ═══════════════════════════════════════════
+       MODAL 3: HỦY VÉ  (có textarea lý do)
+       ═══════════════════════════════════════════ -->
+  <div class="c-modal-overlay" id="mCancel">
+    <div class="c-modal" style="max-width:480px">
+      <div class="c-modal-header">
+        <h3 class="c-modal-title"><i class="bi bi-x-circle" style="color:var(--clr-danger)"></i> Hủy vé</h3>
+        <button class="c-modal-close" onclick="App.close('mCancel')"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="c-modal-body">
+        <div class="confirm-icon confirm-icon--danger"><i class="bi bi-x-circle-fill"></i></div>
+        <p class="confirm-text" id="cnlText"></p>
+        <p class="confirm-sub" style="margin-bottom:16px">Ghế sẽ được trả lại cho chuyến xe.</p>
+        <div>
+          <label class="c-label">Lý do hủy <span class="req">*</span></label>
+          <textarea class="c-input" id="cnlReason" rows="3" placeholder="Nhập lý do hủy vé..."></textarea>
+        </div>
+      </div>
+      <div class="c-modal-footer" style="justify-content:center">
+        <button class="c-btn c-btn--ghost" onclick="App.close('mCancel')">Đóng</button>
+        <button class="c-btn c-btn--danger" id="btnDoCancel"><i class="bi bi-x-lg"></i> Xác nhận hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast thông báo -->
+  <div class="c-toast" id="toast"></div>
+
+  <!-- Auth guard -->
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       JAVASCRIPT
+       ═══════════════════════════════════════════════════════════════════ -->
+  <script>
+  var App = (function () {
+    'use strict';
+
+    /* ══════════════════════════════════════════════════════════════════
+       1. DỮ LIỆU MẪU — 20 vé (5 mỗi trạng thái)
+       ══════════════════════════════════════════════════════════════════ */
+    var tickets = [
+      /* ────── 5 vé Chờ xác nhận ────── */
+      { id:'VE-1001', cName:'Nguyễn Văn An',    cPhone:'0901 234 567', cEmail:'an.nguyen@gmail.com',
+        tripId:'CX-005', route:'TP.HCM → Nha Trang', tripDate:'06/10/2026', dep:'21:00',
+        vehicle:'51B-34567 (Giường nằm)', driver:'Lê Quốc Bảo',
+        pickup:'Bến xe Miền Đông', dropoff:'Bến xe Nha Trang',
+        seat:'A1', price:350000, bookDate:'01/10/2026', status:'pending' },
+      { id:'VE-1002', cName:'Trần Thị Bích',    cPhone:'0912 345 678', cEmail:'bich.tran@gmail.com',
+        tripId:'CX-007', route:'TP.HCM → Cần Thơ', tripDate:'07/10/2026', dep:'07:00',
+        vehicle:'Chưa phân công', driver:'Chưa phân công',
+        pickup:'Bến xe Miền Tây', dropoff:'Bến xe Cần Thơ',
+        seat:'B3', price:160000, bookDate:'02/10/2026', status:'pending' },
+      { id:'VE-1003', cName:'Lê Hoàng Cường',   cPhone:'0923 456 789', cEmail:'cuong.le@yahoo.com',
+        tripId:'CX-011', route:'Hà Nội → Lào Cai', tripDate:'08/10/2026', dep:'19:30',
+        vehicle:'Chưa phân công', driver:'Chưa phân công',
+        pickup:'Bến xe Mỹ Đình', dropoff:'Bến xe Lào Cai',
+        seat:'C2', price:320000, bookDate:'03/10/2026', status:'pending' },
+      { id:'VE-1004', cName:'Phạm Minh Đức',    cPhone:'0934 567 890', cEmail:'duc.pham@outlook.com',
+        tripId:'CX-001', route:'Hà Nội → Hải Phòng', tripDate:'06/10/2026', dep:'06:00',
+        vehicle:'29A-12345 (Ghế ngồi)', driver:'Nguyễn Văn Tùng',
+        pickup:'Bến xe Mỹ Đình', dropoff:'Bến xe Niệm Nghĩa',
+        seat:'A5', price:150000, bookDate:'03/10/2026', status:'pending' },
+      { id:'VE-1005', cName:'Võ Thị Em',        cPhone:'0945 678 901', cEmail:'em.vo@gmail.com',
+        tripId:'CX-006', route:'Hà Nội → Vinh', tripDate:'07/10/2026', dep:'05:30',
+        vehicle:'29A-23456 (Ghế ngồi)', driver:'Trần Đức Mạnh',
+        pickup:'Bến xe Giáp Bát', dropoff:'Bến xe Vinh',
+        seat:'B1', price:220000, bookDate:'04/10/2026', status:'pending' },
+
+      /* ────── 5 vé Đã xác nhận ────── */
+      { id:'VE-1006', cName:'Hoàng Văn Phúc',   cPhone:'0956 789 012', cEmail:'phuc.hoang@gmail.com',
+        tripId:'CX-001', route:'Hà Nội → Hải Phòng', tripDate:'06/10/2026', dep:'06:00',
+        vehicle:'29A-12345 (Ghế ngồi)', driver:'Nguyễn Văn Tùng',
+        pickup:'Bến xe Mỹ Đình', dropoff:'Bến xe Niệm Nghĩa',
+        seat:'A2', price:150000, bookDate:'30/09/2026', status:'confirmed' },
+      { id:'VE-1007', cName:'Đỗ Thị Giang',     cPhone:'0967 890 123', cEmail:'giang.do@gmail.com',
+        tripId:'CX-002', route:'TP.HCM → Đà Lạt', tripDate:'06/10/2026', dep:'08:00',
+        vehicle:'51B-34567 (Giường nằm)', driver:'Lê Quốc Bảo',
+        pickup:'Bến xe Miền Đông', dropoff:'Bến xe Đà Lạt',
+        seat:'C1', price:280000, bookDate:'01/10/2026', status:'confirmed' },
+      { id:'VE-1008', cName:'Bùi Quang Huy',    cPhone:'0978 901 234', cEmail:'huy.bui@gmail.com',
+        tripId:'CX-004', route:'Hà Nội → Đà Nẵng', tripDate:'06/10/2026', dep:'19:00',
+        vehicle:'29A-78901 (Limousine)', driver:'Đặng Văn Hùng',
+        pickup:'Bến xe Nước Ngầm', dropoff:'Bến xe Trung tâm Đà Nẵng',
+        seat:'A3', price:450000, bookDate:'02/10/2026', status:'confirmed' },
+      { id:'VE-1009', cName:'Ngô Thanh Lan',    cPhone:'0989 012 345', cEmail:'lan.ngo@yahoo.com',
+        tripId:'CX-012', route:'TP.HCM → Phan Thiết', tripDate:'08/10/2026', dep:'06:00',
+        vehicle:'51B-89012 (Giường nằm)', driver:'Bùi Thanh Sơn',
+        pickup:'Bến xe Miền Đông', dropoff:'Bến xe Phan Thiết',
+        seat:'B4', price:180000, bookDate:'04/10/2026', status:'confirmed' },
+      { id:'VE-1010', cName:'Phan Văn Khoa',    cPhone:'0990 123 456', cEmail:'khoa.phan@gmail.com',
+        tripId:'CX-010', route:'Đà Nẵng → Quảng Ngãi', tripDate:'07/10/2026', dep:'14:00',
+        vehicle:'43C-56789 (Ghế ngồi)', driver:'Võ Minh Tuấn',
+        pickup:'Bến xe Trung tâm Đà Nẵng', dropoff:'Bến xe Quảng Ngãi',
+        seat:'A4', price:95000,  bookDate:'03/10/2026', status:'confirmed' },
+
+      /* ────── 5 vé Đã thanh toán ────── */
+      { id:'VE-1011', cName:'Lý Thị Mận',       cPhone:'0901 111 222', cEmail:'man.ly@gmail.com',
+        tripId:'CX-003', route:'Đà Nẵng → Huế', tripDate:'06/10/2026', dep:'09:30',
+        vehicle:'43C-56789 (Ghế ngồi)', driver:'Võ Minh Tuấn',
+        pickup:'Bến xe Trung tâm Đà Nẵng', dropoff:'Bến xe Phía Nam Huế',
+        seat:'B2', price:120000, bookDate:'28/09/2026', status:'paid' },
+      { id:'VE-1012', cName:'Dương Quốc Nam',   cPhone:'0912 222 333', cEmail:'nam.duong@outlook.com',
+        tripId:'CX-001', route:'Hà Nội → Hải Phòng', tripDate:'06/10/2026', dep:'06:00',
+        vehicle:'29A-12345 (Ghế ngồi)', driver:'Nguyễn Văn Tùng',
+        pickup:'Bến xe Mỹ Đình', dropoff:'Bến xe Niệm Nghĩa',
+        seat:'A6', price:150000, bookDate:'29/09/2026', status:'paid' },
+      { id:'VE-1013', cName:'Nguyễn Văn An',    cPhone:'0901 234 567', cEmail:'an.nguyen@gmail.com',
+        tripId:'CX-002', route:'TP.HCM → Đà Lạt', tripDate:'06/10/2026', dep:'08:00',
+        vehicle:'51B-34567 (Giường nằm)', driver:'Lê Quốc Bảo',
+        pickup:'Bến xe Miền Đông', dropoff:'Bến xe Đà Lạt',
+        seat:'A1', price:280000, bookDate:'30/09/2026', status:'paid' },
+      { id:'VE-1014', cName:'Hoàng Văn Phúc',   cPhone:'0956 789 012', cEmail:'phuc.hoang@gmail.com',
+        tripId:'CX-006', route:'Hà Nội → Vinh', tripDate:'07/10/2026', dep:'05:30',
+        vehicle:'29A-23456 (Ghế ngồi)', driver:'Trần Đức Mạnh',
+        pickup:'Bến xe Giáp Bát', dropoff:'Bến xe Vinh',
+        seat:'C3', price:220000, bookDate:'01/10/2026', status:'paid' },
+      { id:'VE-1015', cName:'Đỗ Thị Giang',     cPhone:'0967 890 123', cEmail:'giang.do@gmail.com',
+        tripId:'CX-008', route:'Hà Nội → Thanh Hóa', tripDate:'07/10/2026', dep:'08:00',
+        vehicle:'29A-45678 (Ghế ngồi)', driver:'Phạm Hữu Tài',
+        pickup:'Bến xe Giáp Bát', dropoff:'Bến xe Thanh Hóa',
+        seat:'B5', price:180000, bookDate:'02/10/2026', status:'paid' },
+
+      /* ────── 5 vé Đã hủy ────── */
+      { id:'VE-1016', cName:'Trần Thị Bích',    cPhone:'0912 345 678', cEmail:'bich.tran@gmail.com',
+        tripId:'CX-013', route:'Huế → Đà Nẵng', tripDate:'05/10/2026', dep:'15:00',
+        vehicle:'43C-56789 (Ghế ngồi)', driver:'Võ Minh Tuấn',
+        pickup:'Bến xe Phía Nam Huế', dropoff:'Bến xe Trung tâm Đà Nẵng',
+        seat:'A3', price:120000, bookDate:'28/09/2026', status:'cancelled' },
+      { id:'VE-1017', cName:'Lê Hoàng Cường',   cPhone:'0923 456 789', cEmail:'cuong.le@yahoo.com',
+        tripId:'CX-014', route:'Nha Trang → TP.HCM', tripDate:'05/10/2026', dep:'20:00',
+        vehicle:'51B-90123 (Giường nằm)', driver:'Ngô Đình Khôi',
+        pickup:'Bến xe Nha Trang', dropoff:'Bến xe Miền Đông',
+        seat:'B1', price:350000, bookDate:'29/09/2026', status:'cancelled' },
+      { id:'VE-1018', cName:'Bùi Quang Huy',    cPhone:'0978 901 234', cEmail:'huy.bui@gmail.com',
+        tripId:'CX-015', route:'Cần Thơ → TP.HCM', tripDate:'05/10/2026', dep:'16:00',
+        vehicle:'65D-01234 (Ghế ngồi)', driver:'Phan Quang Vinh',
+        pickup:'Bến xe Cần Thơ', dropoff:'Bến xe Miền Tây',
+        seat:'C4', price:160000, bookDate:'30/09/2026', status:'cancelled' },
+      { id:'VE-1019', cName:'Ngô Thanh Lan',    cPhone:'0989 012 345', cEmail:'lan.ngo@yahoo.com',
+        tripId:'CX-004', route:'Hà Nội → Đà Nẵng', tripDate:'06/10/2026', dep:'19:00',
+        vehicle:'29A-78901 (Limousine)', driver:'Đặng Văn Hùng',
+        pickup:'Bến xe Nước Ngầm', dropoff:'Bến xe Trung tâm Đà Nẵng',
+        seat:'A2', price:450000, bookDate:'01/10/2026', status:'cancelled' },
+      { id:'VE-1020', cName:'Phan Văn Khoa',    cPhone:'0990 123 456', cEmail:'khoa.phan@gmail.com',
+        tripId:'CX-009', route:'TP.HCM → Vũng Tàu', tripDate:'07/10/2026', dep:'10:00',
+        vehicle:'Chưa phân công', driver:'Hoàng Anh Dũng',
+        pickup:'Ngã tư Hàng Xanh', dropoff:'Bến xe Vũng Tàu',
+        seat:'B2', price:120000, bookDate:'03/10/2026', status:'cancelled' },
+    ];
+
+    /* Bản đồ trạng thái vé (theo kịch bản Use Case KH-05 & KH-10) */
+    var STATUS = {
+      holding:   { label: 'Đang giữ chỗ',   cls: 'c-badge--secondary', icon: 'bi-hourglass-split' },
+      pending:   { label: 'Chờ thanh toán',  cls: 'c-badge--warning',   icon: 'bi-clock-fill' },
+      confirmed: { label: 'Đã xác nhận',     cls: 'c-badge--info',      icon: 'bi-check-circle-fill' },
+      paid:      { label: 'Đã thanh toán',   cls: 'c-badge--success',   icon: 'bi-check-circle-fill' },
+      cancelled: { label: 'Đã hủy',          cls: 'c-badge--danger',    icon: 'bi-x-circle-fill' },
+    };
+
+    /* ══════════════════════════════════════════════════════════════════
+       2. HÀM TIỆN ÍCH
+       ══════════════════════════════════════════════════════════════════ */
+    /* Định dạng tiền VNĐ */
+    function fmtPrice(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+
+    /* Tìm vé theo ID */
+    function findTicket(id) { return tickets.find(function (t) { return t.id === id; }); }
+
+    /* Hiển thị toast */
+    function toast(msg, type) {
+      var el = document.getElementById('toast');
+      var icons = { success:'bi-check-circle-fill', danger:'bi-x-circle-fill', warning:'bi-exclamation-triangle-fill', info:'bi-info-circle-fill' };
+      el.className = 'c-toast c-toast--' + (type || 'success');
+      el.innerHTML = '<i class="bi ' + (icons[type] || icons.success) + '"></i> ' + msg;
+      el.classList.add('is-visible');
+      clearTimeout(el._t);
+      el._t = setTimeout(function () { el.classList.remove('is-visible'); }, 3000);
+    }
+
+    /* Mở / Đóng modal */
+    function openModal(id) { document.getElementById(id).classList.add('is-open'); document.body.style.overflow = 'hidden'; }
+    function closeModal(id) { document.getElementById(id).classList.remove('is-open'); document.body.style.overflow = ''; }
+
+    /* Tạo ô thông tin chi tiết */
+    function infoCell(label, value) {
+      return '<div><div class="detail-item-label">' + label + '</div><div class="detail-item-value">' + value + '</div></div>';
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       3. FILTER + PHÂN TRANG
+       ══════════════════════════════════════════════════════════════════ */
+    var searchTerm = '';
+    var filterStatus = '';
+    var filterTrip = '';
+    var curPage = 1;
+    var rowsPerPage = 10;
+
+    /* Lọc danh sách vé */
+    function getFiltered() {
+      return tickets.filter(function (t) {
+        /* Lọc trạng thái */
+        if (filterStatus && t.status !== filterStatus) return false;
+        /* Lọc chuyến xe */
+        if (filterTrip && t.tripId !== filterTrip) return false;
+        /* Tìm kiếm mã vé, tên KH, SĐT */
+        if (searchTerm) {
+          var q = searchTerm;
+          return t.id.toLowerCase().indexOf(q) !== -1 ||
+            t.cName.toLowerCase().indexOf(q) !== -1 ||
+            t.cPhone.replace(/\s/g, '').indexOf(q.replace(/\s/g, '')) !== -1;
+        }
+        return true;
+      });
+    }
+
+    /* Render bảng vé */
+    function renderTable() {
+      var list = getFiltered();
+      var totalPages = Math.max(1, Math.ceil(list.length / rowsPerPage));
+      if (curPage > totalPages) curPage = totalPages;
+      var start = (curPage - 1) * rowsPerPage;
+      var page = list.slice(start, start + rowsPerPage);
+
+      /* Cập nhật tóm tắt */
+      document.getElementById('tSummary').textContent = list.length
+        ? (start + 1) + '–' + Math.min(start + rowsPerPage, list.length) + ' / ' + list.length + ' vé'
+        : '0 kết quả';
+
+      var tbody = document.getElementById('tBody');
+
+      /* Nếu không có dữ liệu */
+      if (!page.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">' +
+          '<i class="bi bi-ticket-perforated"></i>Không tìm thấy vé nào phù hợp.</td></tr>';
+        renderPagination(0, 0);
+        return;
+      }
+
+      /* Render từng dòng */
+      tbody.innerHTML = page.map(function (t) {
+        var s = STATUS[t.status] || STATUS.pending;
+
+        /* Nút thao tác động tuỳ trạng thái */
+        var actions = '';
+        /* Nút "Xem chi tiết" — luôn hiển thị */
+        actions += '<button class="c-btn c-btn--ghost c-btn--icon c-btn--sm js-det" data-id="' + t.id + '" title="Xem chi tiết"><i class="bi bi-eye"></i></button>';
+        /* Nút "Hủy vé" — khi Chờ xác nhận hoặc Đã xác nhận */
+        if (t.status === 'pending' || t.status === 'confirmed') {
+          actions += ' <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm js-cnl" data-id="' + t.id + '" title="Hủy vé" style="color:var(--clr-danger)"><i class="bi bi-x-circle"></i></button>';
+        }
+
+        return '<tr>' +
+          '<td><strong>' + t.id + '</strong></td>' +
+          '<td><div class="cell-main">' + t.cName + '</div><div class="cell-sub">' + t.cPhone + '</div></td>' +
+          '<td><div class="cell-main">' + t.route + '</div><div class="cell-sub">' + t.tripDate + ' · ' + t.dep + '</div></td>' +
+          '<td style="text-align:center"><strong>' + t.seat + '</strong></td>' +
+          '<td style="text-align:right;white-space:nowrap">' + fmtPrice(t.price) + '</td>' +
+          '<td>' + t.bookDate + '</td>' +
+          '<td><span class="c-badge ' + s.cls + '"><i class="bi ' + s.icon + '"></i> ' + s.label + '</span></td>' +
+          '<td style="text-align:center;white-space:nowrap">' + actions + '</td>' +
+          '</tr>';
+      }).join('');
+
+      /* Gắn sự kiện */
+      tbody.querySelectorAll('.js-det').forEach(function (btn) {
+        btn.addEventListener('click', function () { openDetail(this.dataset.id); });
+      });
+      tbody.querySelectorAll('.js-cnl').forEach(function (btn) {
+        btn.addEventListener('click', function () { openCancelModal(this.dataset.id); });
+      });
+
+      renderPagination(curPage, totalPages);
+    }
+
+    /* Render phân trang */
+    function renderPagination(cur, total) {
+      var nav = document.getElementById('pNav');
+      if (total <= 1) { nav.innerHTML = ''; return; }
+
+      var html = '';
+      /* Nút Previous */
+      html += '<button class="c-pagination-btn pg" data-p="' + (cur - 1) + '"' + (cur <= 1 ? ' disabled' : '') + '><i class="bi bi-chevron-left"></i></button>';
+
+      /* Số trang */
+      for (var p = 1; p <= total; p++) {
+        if (total > 7) {
+          if (p === 1 || p === total || (p >= cur - 1 && p <= cur + 1)) {
+            html += '<button class="c-pagination-btn pg' + (p === cur ? ' is-active' : '') + '" data-p="' + p + '">' + p + '</button>';
+          } else if (p === cur - 2 || p === cur + 2) {
+            html += '<span style="padding:0 4px;color:var(--clr-text-secondary)">…</span>';
+          }
+        } else {
+          html += '<button class="c-pagination-btn pg' + (p === cur ? ' is-active' : '') + '" data-p="' + p + '">' + p + '</button>';
+        }
+      }
+
+      /* Nút Next */
+      html += '<button class="c-pagination-btn pg" data-p="' + (cur + 1) + '"' + (cur >= total ? ' disabled' : '') + '><i class="bi bi-chevron-right"></i></button>';
+
+      nav.innerHTML = html;
+      nav.querySelectorAll('.pg:not(:disabled)').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          curPage = parseInt(this.dataset.p);
+          renderTable();
+        });
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       4. MODAL CHI TIẾT VÉ
+       ══════════════════════════════════════════════════════════════════ */
+    var activeTicketId = null;
+
+    function openDetail(id) {
+      var t = findTicket(id);
+      if (!t) return;
+      activeTicketId = id;
+      var s = STATUS[t.status] || STATUS.pending;
+
+      document.getElementById('detTitle').textContent = 'Chi tiết vé ' + t.id;
+
+      /* Khu vực 1 — Thông tin khách hàng */
+      document.getElementById('detCust').innerHTML =
+        infoCell('Họ và tên', t.cName) +
+        infoCell('Số điện thoại', t.cPhone) +
+        infoCell('Email', t.cEmail);
+
+      /* Khu vực 2 — Thông tin chuyến xe */
+      document.getElementById('detTrip').innerHTML =
+        infoCell('Mã chuyến', t.tripId) +
+        infoCell('Tuyến đường', t.route) +
+        infoCell('Ngày khởi hành', t.tripDate) +
+        infoCell('Giờ khởi hành', t.dep) +
+        infoCell('Xe', t.vehicle) +
+        infoCell('Tài xế', t.driver) +
+        infoCell('Điểm đón', t.pickup) +
+        infoCell('Điểm trả', t.dropoff);
+
+      /* Khu vực 3 — Thông tin vé */
+      document.getElementById('detTicket').innerHTML =
+        infoCell('Số ghế', '<strong>' + t.seat + '</strong>') +
+        infoCell('Tổng tiền', '<strong style="color:var(--clr-success)">' + fmtPrice(t.price) + '</strong>') +
+        infoCell('Ngày đặt', t.bookDate) +
+        infoCell('Trạng thái', '<span class="c-badge ' + s.cls + '"><i class="bi ' + s.icon + '"></i> ' + s.label + '</span>');
+
+      /* Footer modal — nút tuỳ trạng thái */
+      var fHtml = '<button class="c-btn c-btn--ghost" onclick="App.close(\'mDetail\')">Đóng</button>';
+      if (t.status === 'pending' || t.status === 'confirmed') {
+        fHtml += ' <button class="c-btn c-btn--danger" onclick="App.close(\'mDetail\');App.openCancel(\'' + id + '\')"><i class="bi bi-x-lg"></i> Hủy vé</button>';
+      }
+      document.getElementById('detFooter').innerHTML = fHtml;
+
+      openModal('mDetail');
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       5. MODAL HỦY VÉ  (có textarea nhập lý do)
+       ══════════════════════════════════════════════════════════════════ */
+    function openCancelModal(id) {
+      var t = findTicket(id);
+      if (!t) return;
+      activeTicketId = id;
+      document.getElementById('cnlText').textContent =
+        'Bạn có chắc muốn hủy vé ' + t.id + '?';
+      document.getElementById('cnlReason').value = '';
+      openModal('mCancel');
+    }
+
+    function doCancel() {
+      var reason = document.getElementById('cnlReason').value.trim();
+      if (!reason) {
+        toast('Vui lòng nhập lý do hủy vé.', 'warning');
+        return;
+      }
+      var t = findTicket(activeTicketId);
+      if (!t) return;
+      t.status = 'cancelled';
+      closeModal('mCancel');
+      renderTable();
+      toast('Đã hủy vé ' + t.id + '. Ghế ' + t.seat + ' đã được trả lại.', 'danger');
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       7. DROPDOWN LỌC CHUYẾN XE
+       ══════════════════════════════════════════════════════════════════ */
+    function buildTripFilter() {
+      var seen = {};
+      var opts = '<option value="">Tất cả chuyến xe</option>';
+      tickets.forEach(function (t) {
+        if (!seen[t.tripId]) {
+          seen[t.tripId] = true;
+          opts += '<option value="' + t.tripId + '">' + t.tripId + ' — ' + t.route + ' (' + t.tripDate + ')</option>';
+        }
+      });
+      document.getElementById('fTrip').innerHTML = opts;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       8. SIDEBAR TOGGLE  (responsive)
+       ══════════════════════════════════════════════════════════════════ */
+    function initSidebar() {
+      var sidebar = document.getElementById('sidebar');
+      var toggle = document.getElementById('sidebarToggle');
+      var overlay = document.getElementById('sidebarOverlay');
+      if (!toggle) return;
+
+      function closeSidebar() {
+        sidebar.classList.remove('is-open');
+        overlay.classList.remove('is-visible');
+        document.body.style.overflow = '';
+      }
+
+      toggle.addEventListener('click', function () {
+        var isOpen = sidebar.classList.toggle('is-open');
+        overlay.classList.toggle('is-visible', isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+      });
+      overlay.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSidebar(); });
+      window.addEventListener('resize', function () { if (window.innerWidth >= 992) closeSidebar(); });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       9. KHỞI TẠO
+       ══════════════════════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function () {
+      initSidebar();
+      buildTripFilter();
+      renderTable();
+
+      /* Tìm kiếm realtime */
+      document.getElementById('fSearch').addEventListener('input', function () {
+        searchTerm = this.value.toLowerCase().trim();
+        curPage = 1;
+        renderTable();
+      });
+
+      /* Lọc trạng thái */
+      document.getElementById('fStatus').addEventListener('change', function () {
+        filterStatus = this.value;
+        curPage = 1;
+        renderTable();
+      });
+
+      /* Lọc chuyến xe */
+      document.getElementById('fTrip').addEventListener('change', function () {
+        filterTrip = this.value;
+        curPage = 1;
+        renderTable();
+      });
+
+      /* Số dòng / trang */
+      document.getElementById('rpp').addEventListener('change', function () {
+        rowsPerPage = parseInt(this.value);
+        curPage = 1;
+        renderTable();
+      });
+
+      /* Nút hủy vé */
+      document.getElementById('btnDoCancel').addEventListener('click', doCancel);
+
+      /* Đóng modal khi click overlay */
+      document.querySelectorAll('.c-modal-overlay').forEach(function (ov) {
+        ov.addEventListener('click', function (e) {
+          if (e.target === this) { this.classList.remove('is-open'); document.body.style.overflow = ''; }
+        });
+      });
+
+      /* Escape đóng tất cả modal */
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.c-modal-overlay.is-open').forEach(function (m) {
+            m.classList.remove('is-open');
+          });
+          document.body.style.overflow = '';
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════════════════════════════
+       10. PUBLIC API  (cho onclick inline)
+       ══════════════════════════════════════════════════════════════════ */
+    return {
+      close: closeModal,
+      openCancel: openCancelModal
+    };
+  })();
+  </script>
+
+</body>
+</html>

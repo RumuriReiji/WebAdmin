@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Đăng nhập — Nhà xe Trác Truyệt</title>
+
+  <!-- Google Fonts — Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════ DESIGN TOKENS (design_system.md) ═══════════════ */
+    :root {
+      --clr-primary: #1976D2;
+      --clr-primary-dark: #1565C0;
+      --clr-primary-darker: #0D47A1;
+      --clr-danger: #D32F2F;
+      --clr-danger-light: #FFEBEE;
+      --clr-success: #2E7D32;
+      --clr-text: #212121;
+      --clr-text-secondary: #757575;
+      --clr-border: #E0E0E0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, .10);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, .14);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* ═══════════════ RESET ═══════════════ */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      font-size: 14px;
+      color: var(--clr-text);
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════ FULL-PAGE LAYOUT — 2 cột ═══════════════ */
+    .login-page {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Cột trái: Hình minh họa / branding ── */
+    .login-brand {
+      flex: 1;
+      background: linear-gradient(135deg, var(--clr-primary-darker) 0%, var(--clr-primary) 50%, #42A5F5 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Hiệu ứng trang trí phía sau */
+    .login-brand::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 50%;
+      top: -120px;
+      right: -120px;
+    }
+    .login-brand::after {
+      content: '';
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      background: rgba(255, 255, 255, .04);
+      border-radius: 50%;
+      bottom: -80px;
+      left: -80px;
+    }
+    .brand-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, .15);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, .2);
+    }
+    .brand-name {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-tagline {
+      font-size: 15px;
+      opacity: .8;
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-features {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      opacity: .85;
+    }
+    .brand-feature i {
+      font-size: 18px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, .12);
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    /* ── Cột phải: Form đăng nhập ── */
+    .login-form-wrapper {
+      width: 520px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 56px;
+      background: #fff;
+    }
+    .login-form-inner {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    /* Header form */
+    .form-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .form-logo {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--clr-primary), var(--clr-primary-dark));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #fff;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, .3);
+    }
+    .form-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--clr-text);
+      margin: 0 0 4px;
+    }
+    .form-subtitle {
+      font-size: 14px;
+      color: var(--clr-text-secondary);
+      margin: 0;
+    }
+
+    /* Form groups */
+    .login-group {
+      margin-bottom: 18px;
+    }
+    .login-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--clr-text);
+      margin-bottom: 6px;
+    }
+    .login-input-wrapper {
+      position: relative;
+    }
+    .login-input-wrapper > .icon-left {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--clr-text-secondary);
+      font-size: 16px;
+      pointer-events: none;
+      transition: color .15s;
+    }
+    .login-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px 0 42px;
+      font-family: var(--font-family);
+      font-size: 14px;
+      color: var(--clr-text);
+      background: #FAFAFA;
+      border: 1.5px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .login-input:focus {
+      outline: none;
+      border-color: var(--clr-primary);
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, .15);
+      background: #fff;
+    }
+    .login-input:focus + .icon-left,
+    .login-input:focus ~ .icon-left {
+      color: var(--clr-primary);
+    }
+    .login-input::placeholder {
+      color: #BDBDBD;
+    }
+    .login-input.is-error {
+      border-color: var(--clr-danger);
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, .1);
+    }
+
+    /* Toggle mật khẩu */
+    .toggle-pw {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      font-size: 18px;
+      color: var(--clr-text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color .15s;
+    }
+    .toggle-pw:hover {
+      color: var(--clr-primary);
+    }
+
+    /* Error message */
+    .field-error {
+      font-size: 12px;
+      color: var(--clr-danger);
+      margin-top: 4px;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+    .field-error.is-visible {
+      display: flex;
+    }
+    .field-error i {
+      font-size: 13px;
+    }
+
+    /* Remember + Forgot */
+    .login-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .remember-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--clr-text-secondary);
+      cursor: pointer;
+    }
+    .remember-check input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--clr-primary);
+      cursor: pointer;
+    }
+    .forgot-link {
+      font-size: 13px;
+      color: var(--clr-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Nút đăng nhập */
+    .btn-login {
+      width: 100%;
+      height: 46px;
+      font-family: var(--font-family);
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, var(--clr-primary), var(--clr-primary-dark));
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, .3);
+    }
+    .btn-login:hover:not(:disabled) {
+      opacity: .92;
+      box-shadow: 0 6px 16px rgba(25, 118, 210, .35);
+    }
+    .btn-login:active:not(:disabled) {
+      transform: scale(.98);
+    }
+    .btn-login:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+    .btn-login .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    .btn-login.is-loading .spinner { display: block; }
+    .btn-login.is-loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast lỗi */
+    .login-alert {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 18px;
+    }
+    .login-alert.is-visible {
+      display: flex;
+      animation: alertIn .25s ease;
+    }
+    .login-alert--error {
+      background: var(--clr-danger-light);
+      color: var(--clr-danger);
+    }
+    .login-alert--success {
+      background: #E8F5E9;
+      color: var(--clr-success);
+    }
+    @keyframes alertIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Footer */
+    .login-footer {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 12px;
+      color: #BDBDBD;
+    }
+
+    /* ═══════════════ RESPONSIVE ═══════════════ */
+    @media (max-width: 991.98px) {
+      .login-brand { display: none; }
+      .login-form-wrapper { width: 100%; padding: 32px 24px; }
+      .login-page { background: linear-gradient(135deg, var(--clr-primary-darker) 0%, var(--clr-primary) 100%); }
+      .login-form-wrapper { border-radius: 0; }
+    }
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+      .login-form-wrapper { width: 460px; padding: 40px 44px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-page">
+
+    <!-- ═══════════ CỘT TRÁI: BRANDING ═══════════ -->
+    <div class="login-brand">
+      <div class="brand-icon"><i class="bi bi-bus-front-fill"></i></div>
+      <div class="brand-name">Nhà xe Trác Truyệt</div>
+      <div class="brand-tagline">Hệ thống Quản lý bán vé xe khách — Trang quản trị dành cho Admin.</div>
+      <div class="brand-features">
+        <div class="brand-feature"><i class="bi bi-speedometer2"></i> Quản lý chuyến xe & lịch trình</div>
+        <div class="brand-feature"><i class="bi bi-ticket-perforated-fill"></i> Theo dõi vé xe thời gian thực</div>
+        <div class="brand-feature"><i class="bi bi-graph-up-arrow"></i> Thống kê doanh thu chi tiết</div>
+        <div class="brand-feature"><i class="bi bi-people-fill"></i> Phân công nhân sự hiệu quả</div>
+      </div>
+    </div>
+
+    <!-- ═══════════ CỘT PHẢI: FORM ĐĂNG NHẬP ═══════════ -->
+    <div class="login-form-wrapper">
+      <div class="login-form-inner">
+
+        <!-- Header form -->
+        <div class="form-header">
+          <div class="form-logo"><i class="bi bi-bus-front-fill"></i></div>
+          <h1 class="form-title">Đăng nhập</h1>
+          <p class="form-subtitle">Nhập thông tin tài khoản Admin để tiếp tục.</p>
+        </div>
+
+        <!-- Thông báo lỗi chung -->
+        <div class="login-alert login-alert--error" id="alertError">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span id="alertMsg">Email hoặc mật khẩu không chính xác.</span>
+        </div>
+        <div class="login-alert login-alert--success" id="alertSuccess">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Đăng nhập thành công! Đang chuyển hướng...</span>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" novalidate>
+          <!-- Email -->
+          <div class="login-group">
+            <label class="login-label" for="email">Email</label>
+            <div class="login-input-wrapper">
+              <input type="email" class="login-input" id="email" placeholder="admin@nhaxe.vn" autocomplete="email"/>
+              <i class="bi bi-envelope icon-left"></i>
+            </div>
+            <div class="field-error" id="errEmail"><i class="bi bi-exclamation-circle"></i> <span></span></div>
+          </div>
+
+          <!-- Mật khẩu -->
+          <div class="login-group">
+            <label class="login-label" for="password">Mật khẩu</label>
+            <div class="login-input-wrapper">
+              <input type="password" class="login-input" id="password" placeholder="Nhập mật khẩu..." autocomplete="current-password" style="padding-right:42px"/>
+              <i class="bi bi-lock icon-left"></i>
+              <button type="button" class="toggle-pw" id="togglePw" title="Hiện/Ẩn mật khẩu"><i class="bi bi-eye"></i></button>
+            </div>
+            <div class="field-error" id="errPw"><i class="bi bi-exclamation-circle"></i> <span></span></div>
+          </div>
+
+          <!-- Ghi nhớ + Quên mật khẩu -->
+          <div class="login-options">
+            <label class="remember-check"><input type="checkbox" id="remember"/> Ghi nhớ đăng nhập</label>
+            <a href="#" class="forgot-link" onclick="event.preventDefault();alert('Vui lòng liên hệ quản trị viên để đặt lại mật khẩu.')">Quên mật khẩu?</a>
+          </div>
+
+          <!-- Nút đăng nhập -->
+          <button type="submit" class="btn-login" id="btnLogin">
+            <span class="btn-text"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="login-footer">
+          © 2026 Nhà xe Trác Truyệt · Hệ thống quản trị nội bộ
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       JAVASCRIPT — Validation + Login logic
+       ═══════════════════════════════════════════════ -->
+  <script>
+  (function () {
+    'use strict';
+
+    /* ══════════════════════════════════════════
+       0. NẾU ĐÃ ĐĂNG NHẬP → CHUYỂN THẲNG VÀO DASHBOARD
+       ══════════════════════════════════════════ */
+    if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    /* ══════════════════════════════════════════
+       1. TÀI KHOẢN DEMO (chưa kết nối Firebase)
+       ══════════════════════════════════════════ */
+    var DEMO_EMAIL = 'admin@nhaxe.vn';
+    var DEMO_PASS = 'admin123';
+
+    /* ══════════════════════════════════════════
+       2. DOM ELEMENTS
+       ══════════════════════════════════════════ */
+    var form      = document.getElementById('loginForm');
+    var emailEl   = document.getElementById('email');
+    var passEl    = document.getElementById('password');
+    var btnLogin  = document.getElementById('btnLogin');
+    var togglePw  = document.getElementById('togglePw');
+    var errEmail  = document.getElementById('errEmail');
+    var errPw     = document.getElementById('errPw');
+    var alertErr  = document.getElementById('alertError');
+    var alertOk   = document.getElementById('alertSuccess');
+
+    /* ══════════════════════════════════════════
+       3. TOGGLE HIỆN / ẨN MẬT KHẨU
+       ══════════════════════════════════════════ */
+    togglePw.addEventListener('click', function () {
+      var isPassword = passEl.type === 'password';
+      passEl.type = isPassword ? 'text' : 'password';
+      this.querySelector('i').className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+
+    /* ══════════════════════════════════════════
+       4. VALIDATION HELPERS
+       ══════════════════════════════════════════ */
+    function showError(el, errEl, msg) {
+      el.classList.add('is-error');
+      errEl.querySelector('span').textContent = msg;
+      errEl.classList.add('is-visible');
+    }
+    function clearError(el, errEl) {
+      el.classList.remove('is-error');
+      errEl.classList.remove('is-visible');
+    }
+    function isValidEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+    function validate() {
+      var ok = true;
+      var email = emailEl.value.trim();
+      var pass = passEl.value;
+
+      /* Validate email */
+      clearError(emailEl, errEmail);
+      if (!email) {
+        showError(emailEl, errEmail, 'Vui lòng nhập email.');
+        ok = false;
+      } else if (!isValidEmail(email)) {
+        showError(emailEl, errEmail, 'Email không đúng định dạng.');
+        ok = false;
+      }
+
+      /* Validate mật khẩu */
+      clearError(passEl, errPw);
+      if (!pass) {
+        showError(passEl, errPw, 'Vui lòng nhập mật khẩu.');
+        ok = false;
+      } else if (pass.length < 6) {
+        showError(passEl, errPw, 'Mật khẩu tối thiểu 6 ký tự.');
+        ok = false;
+      }
+
+      return ok;
+    }
+
+    /* Xóa lỗi khi user gõ */
+    emailEl.addEventListener('input', function () { clearError(emailEl, errEmail); hideAlerts(); });
+    passEl.addEventListener('input', function () { clearError(passEl, errPw); hideAlerts(); });
+
+    function hideAlerts() {
+      alertErr.classList.remove('is-visible');
+      alertOk.classList.remove('is-visible');
+    }
+
+    /* ══════════════════════════════════════════
+       5. SUBMIT FORM
+       ══════════════════════════════════════════ */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      hideAlerts();
+
+      /* Validation */
+      if (!validate()) return;
+
+      var email = emailEl.value.trim();
+      var pass = passEl.value;
+
+      /* Hiệu ứng loading */
+      btnLogin.classList.add('is-loading');
+      btnLogin.disabled = true;
+
+      /* Giả lập delay gọi API (500ms) */
+      setTimeout(function () {
+        btnLogin.classList.remove('is-loading');
+        btnLogin.disabled = false;
+
+        /* Kiểm tra tài khoản demo */
+        if (email === DEMO_EMAIL && pass === DEMO_PASS) {
+          /* Đăng nhập thành công — lưu session */
+          sessionStorage.setItem('adminLoggedIn', 'true');
+          sessionStorage.setItem('adminName', 'Admin Nguyễn');
+          sessionStorage.setItem('adminEmail', email);
+
+          alertOk.classList.add('is-visible');
+          btnLogin.disabled = true;
+
+          /* Chuyển hướng sau 1 giây */
+          setTimeout(function () {
+            window.location.href = 'index.html';
+          }, 1000);
+        } else {
+          /* Sai tài khoản */
+          document.getElementById('alertMsg').textContent = 'Email hoặc mật khẩu không chính xác.';
+          alertErr.classList.add('is-visible');
+          /* Focus lại email */
+          emailEl.focus();
+          emailEl.select();
+        }
+      }, 500);
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

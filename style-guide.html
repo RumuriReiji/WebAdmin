@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Style Guide — Hệ thống Quản lý bán vé xe khách</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <style>
+    /* ===================================================================
+       CSS CUSTOM PROPERTIES (Design Tokens)
+       =================================================================== */
+    :root {
+      /* Colors */
+      --clr-primary: #1976D2;
+      --clr-primary-dark: #1565C0;
+      --clr-primary-light: #BBDEFB;
+      --clr-success: #2E7D32;
+      --clr-success-light: #E8F5E9;
+      --clr-warning: #F57C00;
+      --clr-warning-light: #FFF3E0;
+      --clr-danger: #D32F2F;
+      --clr-danger-light: #FFEBEE;
+      --clr-info: #0288D1;
+      --clr-info-light: #E3F2FD;
+      --clr-bg: #F5F5F5;
+      --clr-surface: #FFFFFF;
+      --clr-text: #212121;
+      --clr-text-secondary: #757575;
+      --clr-border: #E0E0E0;
+      --clr-sidebar-bg: #0D47A1;
+      --clr-sidebar-text: #FFFFFF;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.14);
+
+      /* Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 20px;
+
+      /* Typography */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    /* ===================================================================
+       GLOBAL RESET
+       =================================================================== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      font-size: 14px;
+      color: var(--clr-text);
+      background: var(--clr-bg);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ===================================================================
+       LAYOUT — Sidebar + Header + Main
+       =================================================================== */
+
+    /* ---- Sidebar ---- */
+    .layout-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100vh;
+      background: var(--clr-sidebar-bg);
+      color: var(--clr-sidebar-text);
+      z-index: 1040;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      flex-shrink: 0;
+    }
+
+    .sidebar-brand i {
+      font-size: 24px;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 12px 0;
+      margin: 0;
+      flex: 1;
+    }
+
+    .sidebar-nav-label {
+      padding: 8px 20px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .sidebar-nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar-nav-item a:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .sidebar-nav-item a.is-active {
+      background: rgba(255, 255, 255, 0.15);
+      border-left-color: #fff;
+      color: #fff;
+    }
+
+    .sidebar-nav-item a i {
+      font-size: 18px;
+      width: 22px;
+      text-align: center;
+    }
+
+    /* ---- Header ---- */
+    .layout-header {
+      position: fixed;
+      top: 0;
+      left: 260px;
+      right: 0;
+      height: 56px;
+      background: var(--clr-surface);
+      box-shadow: var(--shadow-sm);
+      z-index: 1030;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      transition: left 0.3s ease;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-toggle {
+      display: none;
+      border: none;
+      background: none;
+      font-size: 22px;
+      color: var(--clr-text);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .header-breadcrumb {
+      font-size: 14px;
+      color: var(--clr-text-secondary);
+    }
+
+    .header-breadcrumb span {
+      color: var(--clr-text);
+      font-weight: 600;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-search {
+      position: relative;
+      min-width: 240px;
+    }
+
+    .header-search input {
+      width: 100%;
+      height: 36px;
+      padding: 0 12px 0 36px;
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .header-search input:focus {
+      outline: none;
+      border-color: var(--clr-primary);
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+      background: #fff;
+    }
+
+    .header-search i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--clr-text-secondary);
+      font-size: 15px;
+    }
+
+    .header-icon-btn {
+      position: relative;
+      border: none;
+      background: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--clr-text-secondary);
+      font-size: 20px;
+      transition: background 0.15s;
+    }
+
+    .header-icon-btn:hover {
+      background: var(--clr-bg);
+      color: var(--clr-text);
+    }
+
+    .header-icon-btn .badge-dot {
+      position: absolute;
+      top: 6px;
+      right: 7px;
+      width: 9px;
+      height: 9px;
+      background: var(--clr-danger);
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--clr-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    /* ---- Main Content ---- */
+    .layout-main {
+      margin-left: 260px;
+      margin-top: 56px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+      transition: margin-left 0.3s ease;
+    }
+
+    /* ===================================================================
+       COMPONENTS
+       =================================================================== */
+
+    /* ---- Buttons ---- */
+    .c-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 38px;
+      padding: 0 18px;
+      font-family: var(--font-family);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .c-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .c-btn--primary {
+      background: var(--clr-primary);
+      color: #fff;
+    }
+
+    .c-btn--primary:hover:not(:disabled) {
+      background: var(--clr-primary-dark);
+    }
+
+    .c-btn--secondary {
+      background: transparent;
+      color: var(--clr-primary);
+      border: 1px solid var(--clr-primary);
+    }
+
+    .c-btn--secondary:hover:not(:disabled) {
+      background: rgba(25, 118, 210, 0.06);
+    }
+
+    .c-btn--success {
+      background: var(--clr-success);
+      color: #fff;
+    }
+
+    .c-btn--success:hover:not(:disabled) {
+      background: #256b29;
+    }
+
+    .c-btn--danger {
+      background: var(--clr-danger);
+      color: #fff;
+    }
+
+    .c-btn--danger:hover:not(:disabled) {
+      background: #b72626;
+    }
+
+    .c-btn--ghost {
+      background: transparent;
+      color: var(--clr-text);
+    }
+
+    .c-btn--ghost:hover:not(:disabled) {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .c-btn--sm {
+      height: 30px;
+      padding: 0 12px;
+      font-size: 13px;
+    }
+
+    .c-btn--lg {
+      height: 46px;
+      padding: 0 24px;
+      font-size: 15px;
+    }
+
+    .c-btn--icon {
+      width: 38px;
+      padding: 0;
+    }
+
+    .c-btn--icon.c-btn--sm {
+      width: 30px;
+    }
+
+    .c-btn--icon.c-btn--lg {
+      width: 46px;
+    }
+
+    /* ---- Input / Form Controls ---- */
+    .c-form-group {
+      margin-bottom: 16px;
+    }
+
+    .c-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: var(--clr-text);
+    }
+
+    .c-label .required {
+      color: var(--clr-danger);
+      margin-left: 2px;
+    }
+
+    .c-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      font-family: var(--font-family);
+      font-size: 14px;
+      color: var(--clr-text);
+      background: #fff;
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .c-input:focus {
+      outline: none;
+      border-color: var(--clr-primary);
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+    }
+
+    .c-input::placeholder {
+      color: var(--clr-text-secondary);
+    }
+
+    .c-input.has-error {
+      border-color: var(--clr-danger);
+    }
+
+    .c-input.has-error:focus {
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+    }
+
+    .c-input--lg {
+      height: 46px;
+      font-size: 15px;
+    }
+
+    .c-helper {
+      font-size: 12px;
+      margin-top: 4px;
+      color: var(--clr-text-secondary);
+    }
+
+    .c-helper--error {
+      color: var(--clr-danger);
+    }
+
+    .c-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    textarea.c-input {
+      height: auto;
+      min-height: 80px;
+      padding: 10px 12px;
+      resize: vertical;
+    }
+
+    /* ---- Table ---- */
+    .c-table-wrapper {
+      background: var(--clr-surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .c-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .c-table thead th {
+      background: #F5F5F5;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--clr-text-secondary);
+      text-align: left;
+      border-bottom: 1px solid var(--clr-border);
+      white-space: nowrap;
+    }
+
+    .c-table tbody td {
+      padding: 12px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--clr-border);
+      vertical-align: middle;
+    }
+
+    .c-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .c-table tbody tr:hover {
+      background: rgba(25, 118, 210, 0.04);
+    }
+
+    .c-table .cell-actions {
+      white-space: nowrap;
+    }
+
+    /* ---- Pagination ---- */
+    .c-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid var(--clr-border);
+      font-size: 13px;
+      color: var(--clr-text-secondary);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .c-pagination-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .c-pagination-info select {
+      height: 30px;
+      padding: 0 28px 0 8px;
+      border: 1px solid var(--clr-border);
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23757575' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-color: #fff;
+    }
+
+    .c-pagination-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .c-pagination-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--clr-border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--clr-text);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .c-pagination-btn:hover:not(:disabled) {
+      border-color: var(--clr-primary);
+      color: var(--clr-primary);
+    }
+
+    .c-pagination-btn.is-active {
+      background: var(--clr-primary);
+      border-color: var(--clr-primary);
+      color: #fff;
+    }
+
+    .c-pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ---- Badge / Status ---- */
+    .c-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .c-badge--success {
+      background: var(--clr-success-light);
+      color: var(--clr-success);
+    }
+
+    .c-badge--warning {
+      background: var(--clr-warning-light);
+      color: var(--clr-warning);
+    }
+
+    .c-badge--danger {
+      background: var(--clr-danger-light);
+      color: var(--clr-danger);
+    }
+
+    .c-badge--info {
+      background: var(--clr-info-light);
+      color: var(--clr-info);
+    }
+
+    /* ---- KPI Card ---- */
+    .c-kpi-card {
+      background: var(--clr-surface);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: box-shadow 0.2s;
+    }
+
+    .c-kpi-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .c-kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .c-kpi-icon--primary {
+      background: var(--clr-info-light);
+      color: var(--clr-primary);
+    }
+
+    .c-kpi-icon--success {
+      background: var(--clr-success-light);
+      color: var(--clr-success);
+    }
+
+    .c-kpi-icon--warning {
+      background: var(--clr-warning-light);
+      color: var(--clr-warning);
+    }
+
+    .c-kpi-icon--danger {
+      background: var(--clr-danger-light);
+      color: var(--clr-danger);
+    }
+
+    .c-kpi-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .c-kpi-label {
+      font-size: 13px;
+      color: var(--clr-text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .c-kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--clr-text);
+      line-height: 1.2;
+    }
+
+    .c-kpi-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 6px;
+    }
+
+    .c-kpi-trend--up {
+      color: var(--clr-success);
+    }
+
+    .c-kpi-trend--down {
+      color: var(--clr-danger);
+    }
+
+    /* ---- Modal ---- */
+    .c-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      animation: modalFadeIn 0.2s ease;
+    }
+
+    .c-modal-overlay.is-open {
+      display: flex;
+    }
+
+    .c-modal {
+      background: var(--clr-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      animation: modalSlideUp 0.2s ease;
+    }
+
+    .c-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    .c-modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .c-modal-close {
+      border: none;
+      background: none;
+      font-size: 22px;
+      color: var(--clr-text-secondary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .c-modal-close:hover {
+      background: var(--clr-bg);
+      color: var(--clr-text);
+    }
+
+    .c-modal-body {
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .c-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--clr-border);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===================================================================
+       STYLE GUIDE PAGE — Section styles
+       =================================================================== */
+    .sg-section {
+      margin-bottom: 48px;
+    }
+
+    .sg-section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--clr-text);
+      margin-bottom: 8px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--clr-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sg-subsection-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--clr-text-secondary);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    .sg-component-box {
+      background: var(--clr-surface);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+
+    .sg-color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .sg-color-swatch {
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sg-color-swatch-preview {
+      height: 64px;
+    }
+
+    .sg-color-swatch-info {
+      padding: 8px 10px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .sg-color-swatch-info strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .sg-color-swatch-info code {
+      color: var(--clr-text-secondary);
+      font-size: 11px;
+    }
+
+    .sg-typo-sample {
+      margin-bottom: 12px;
+    }
+
+    .sg-typo-sample .meta {
+      font-size: 12px;
+      color: var(--clr-text-secondary);
+      margin-top: 2px;
+    }
+
+    .sg-shadow-demo {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .sg-shadow-item {
+      width: 140px;
+      height: 80px;
+      background: #fff;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--clr-text-secondary);
+    }
+
+    .sg-btn-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .sg-input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 767.98px) {
+      .layout-sidebar {
+        transform: translateX(-100%);
+      }
+
+      .layout-sidebar.is-open {
+        transform: translateX(0);
+      }
+
+      .layout-header {
+        left: 0;
+      }
+
+      .layout-main {
+        margin-left: 0;
+      }
+
+      .header-toggle {
+        display: flex;
+      }
+
+      .header-search {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===============================================================
+       SIDEBAR
+       =============================================================== -->
+  <aside class="layout-sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="bi bi-bus-front-fill"></i>
+      VéXe Admin
+    </div>
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-label">Chính</li>
+      <li class="sidebar-nav-item">
+        <a href="#" class="is-active"><i class="bi bi-grid-1x2-fill"></i> Tổng quan</a>
+      </li>
+      <li class="sidebar-nav-label">Quản lý</li>
+      <li class="sidebar-nav-item">
+        <a href="#"><i class="bi bi-people-fill"></i> Nhân viên</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="#"><i class="bi bi-person-fill"></i> Khách hàng</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="#"><i class="bi bi-signpost-split-fill"></i> Chuyến xe</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="#"><i class="bi bi-ticket-perforated-fill"></i> Vé xe</a>
+      </li>
+      <li class="sidebar-nav-item">
+        <a href="#"><i class="bi bi-truck-front-fill"></i> Xe</a>
+      </li>
+      <li class="sidebar-nav-label">Báo cáo</li>
+      <li class="sidebar-nav-item">
+        <a href="#"><i class="bi bi-graph-up-arrow"></i> Doanh thu</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- ===============================================================
+       HEADER
+       =============================================================== -->
+  <header class="layout-header">
+    <div class="header-left">
+      <button class="header-toggle" onclick="document.getElementById('sidebar').classList.toggle('is-open')">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="header-breadcrumb">
+        <i class="bi bi-house-fill"></i> &nbsp;/ &nbsp;<span>Style Guide</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-search">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Tìm kiếm..." />
+      </div>
+      <button class="header-icon-btn" title="Thông báo">
+        <i class="bi bi-bell-fill"></i>
+        <span class="badge-dot"></span>
+      </button>
+      <div class="header-avatar" title="Admin">A</div>
+    </div>
+  </header>
+
+  <!-- ===============================================================
+       MAIN CONTENT — Style Guide Sections
+       =============================================================== -->
+  <main class="layout-main">
+
+    <h1 style="font-size:28px;font-weight:700;margin-bottom:4px;">🎨 Style Guide</h1>
+    <p style="color:var(--clr-text-secondary);margin-bottom:32px;">Hệ thống Quản lý bán vé xe khách — Preview tất cả components</p>
+
+    <!-- ============================================================
+         1. COLORS
+         ============================================================ -->
+    <section class="sg-section" id="colors">
+      <h2 class="sg-section-title"><i class="bi bi-palette-fill"></i> 1. Bảng màu</h2>
+      <div class="sg-color-grid">
+        <!-- Primary -->
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#1976D2"></div>
+          <div class="sg-color-swatch-info"><strong>Primary</strong><code>#1976D2</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#1565C0"></div>
+          <div class="sg-color-swatch-info"><strong>Primary Dark</strong><code>#1565C0</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#BBDEFB"></div>
+          <div class="sg-color-swatch-info"><strong>Primary Light</strong><code>#BBDEFB</code></div>
+        </div>
+        <!-- Semantic -->
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#2E7D32"></div>
+          <div class="sg-color-swatch-info"><strong>Success</strong><code>#2E7D32</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#F57C00"></div>
+          <div class="sg-color-swatch-info"><strong>Warning</strong><code>#F57C00</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#D32F2F"></div>
+          <div class="sg-color-swatch-info"><strong>Danger</strong><code>#D32F2F</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#0288D1"></div>
+          <div class="sg-color-swatch-info"><strong>Info</strong><code>#0288D1</code></div>
+        </div>
+        <!-- Neutral -->
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#F5F5F5"></div>
+          <div class="sg-color-swatch-info"><strong>Background</strong><code>#F5F5F5</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#FFFFFF;border:1px solid #E0E0E0"></div>
+          <div class="sg-color-swatch-info"><strong>Surface</strong><code>#FFFFFF</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#212121"></div>
+          <div class="sg-color-swatch-info"><strong>Text</strong><code>#212121</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#757575"></div>
+          <div class="sg-color-swatch-info"><strong>Text Secondary</strong><code>#757575</code></div>
+        </div>
+        <div class="sg-color-swatch">
+          <div class="sg-color-swatch-preview" style="background:#0D47A1"></div>
+          <div class="sg-color-swatch-info"><strong>Sidebar</strong><code>#0D47A1</code></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         2. TYPOGRAPHY
+         ============================================================ -->
+    <section class="sg-section" id="typography">
+      <h2 class="sg-section-title"><i class="bi bi-fonts"></i> 2. Typography</h2>
+      <div class="sg-component-box">
+        <div class="sg-typo-sample">
+          <h1 style="font-size:28px;font-weight:700;line-height:1.3;margin:0">Heading 1 — Quản lý Vé xe</h1>
+          <div class="meta">Inter · 28px · Bold (700) · line-height 1.3</div>
+        </div>
+        <div class="sg-typo-sample">
+          <h2 style="font-size:24px;font-weight:700;line-height:1.3;margin:0">Heading 2 — Danh sách Chuyến xe</h2>
+          <div class="meta">Inter · 24px · Bold (700) · line-height 1.3</div>
+        </div>
+        <div class="sg-typo-sample">
+          <h3 style="font-size:20px;font-weight:600;line-height:1.4;margin:0">Heading 3 — Thông tin Khách hàng</h3>
+          <div class="meta">Inter · 20px · Semibold (600) · line-height 1.4</div>
+        </div>
+        <div class="sg-typo-sample">
+          <h4 style="font-size:16px;font-weight:600;line-height:1.4;margin:0">Heading 4 — Chi tiết Nhân viên</h4>
+          <div class="meta">Inter · 16px · Semibold (600) · line-height 1.4</div>
+        </div>
+        <div class="sg-typo-sample">
+          <p style="font-size:14px;font-weight:400;line-height:1.6;margin:0">Body — Hệ thống quản lý bán vé xe khách trực tuyến giúp bạn quản lý toàn bộ hoạt động kinh doanh một cách hiệu quả.</p>
+          <div class="meta">Inter · 14px · Regular (400) · line-height 1.6</div>
+        </div>
+        <div class="sg-typo-sample">
+          <p style="font-size:12px;font-weight:400;line-height:1.5;margin:0;color:var(--clr-text-secondary)">Caption — Cập nhật lần cuối: 05/10/2026 21:00</p>
+          <div class="meta">Inter · 12px · Regular (400) · line-height 1.5</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         3. SHADOWS
+         ============================================================ -->
+    <section class="sg-section" id="shadows">
+      <h2 class="sg-section-title"><i class="bi bi-layers-fill"></i> 3. Shadow / Elevation</h2>
+      <div class="sg-shadow-demo">
+        <div class="sg-shadow-item" style="box-shadow:var(--shadow-sm)">shadow-sm</div>
+        <div class="sg-shadow-item" style="box-shadow:var(--shadow-md)">shadow-md</div>
+        <div class="sg-shadow-item" style="box-shadow:var(--shadow-lg)">shadow-lg</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         4. BUTTONS
+         ============================================================ -->
+    <section class="sg-section" id="buttons">
+      <h2 class="sg-section-title"><i class="bi bi-hand-index-thumb-fill"></i> 4. Buttons</h2>
+      <div class="sg-component-box">
+        <h4 class="sg-subsection-title">Variants</h4>
+        <div class="sg-btn-row">
+          <button class="c-btn c-btn--primary"><i class="bi bi-plus-lg"></i> Thêm mới</button>
+          <button class="c-btn c-btn--secondary"><i class="bi bi-pencil"></i> Chỉnh sửa</button>
+          <button class="c-btn c-btn--success"><i class="bi bi-check-lg"></i> Xác nhận</button>
+          <button class="c-btn c-btn--danger"><i class="bi bi-trash3"></i> Xóa</button>
+          <button class="c-btn c-btn--ghost"><i class="bi bi-x-lg"></i> Hủy</button>
+        </div>
+
+        <h4 class="sg-subsection-title">Sizes</h4>
+        <div class="sg-btn-row">
+          <button class="c-btn c-btn--primary c-btn--sm">Small</button>
+          <button class="c-btn c-btn--primary">Default</button>
+          <button class="c-btn c-btn--primary c-btn--lg">Large</button>
+        </div>
+
+        <h4 class="sg-subsection-title">Icon Buttons</h4>
+        <div class="sg-btn-row">
+          <button class="c-btn c-btn--primary c-btn--icon c-btn--sm"><i class="bi bi-plus-lg"></i></button>
+          <button class="c-btn c-btn--primary c-btn--icon"><i class="bi bi-pencil"></i></button>
+          <button class="c-btn c-btn--danger c-btn--icon"><i class="bi bi-trash3"></i></button>
+          <button class="c-btn c-btn--secondary c-btn--icon"><i class="bi bi-three-dots-vertical"></i></button>
+        </div>
+
+        <h4 class="sg-subsection-title">Disabled</h4>
+        <div class="sg-btn-row">
+          <button class="c-btn c-btn--primary" disabled>Primary Disabled</button>
+          <button class="c-btn c-btn--secondary" disabled>Secondary Disabled</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         5. INPUTS / FORM
+         ============================================================ -->
+    <section class="sg-section" id="inputs">
+      <h2 class="sg-section-title"><i class="bi bi-input-cursor-text"></i> 5. Input / Form Controls</h2>
+      <div class="sg-component-box">
+        <div class="sg-input-grid">
+          <!-- Default -->
+          <div class="c-form-group">
+            <label class="c-label">Họ và tên <span class="required">*</span></label>
+            <input type="text" class="c-input" placeholder="Nhập họ và tên..." />
+          </div>
+          <!-- Large -->
+          <div class="c-form-group">
+            <label class="c-label">Email</label>
+            <input type="email" class="c-input c-input--lg" placeholder="example@email.com" />
+            <div class="c-helper">Chúng tôi sẽ không chia sẻ email của bạn.</div>
+          </div>
+          <!-- Error -->
+          <div class="c-form-group">
+            <label class="c-label">Số điện thoại <span class="required">*</span></label>
+            <input type="tel" class="c-input has-error" value="abc-invalid" />
+            <div class="c-helper c-helper--error"><i class="bi bi-exclamation-circle"></i> Số điện thoại không hợp lệ.</div>
+          </div>
+          <!-- Select -->
+          <div class="c-form-group">
+            <label class="c-label">Tuyến xe</label>
+            <select class="c-input c-select">
+              <option value="">— Chọn tuyến xe —</option>
+              <option>Hà Nội → Hải Phòng</option>
+              <option>TP.HCM → Đà Lạt</option>
+              <option>Đà Nẵng → Huế</option>
+            </select>
+          </div>
+          <!-- Textarea -->
+          <div class="c-form-group" style="grid-column: 1 / -1">
+            <label class="c-label">Ghi chú</label>
+            <textarea class="c-input" placeholder="Nhập ghi chú..."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         6. BADGES / STATUS
+         ============================================================ -->
+    <section class="sg-section" id="badges">
+      <h2 class="sg-section-title"><i class="bi bi-tag-fill"></i> 6. Badge / Trạng thái</h2>
+      <div class="sg-component-box">
+        <div class="sg-btn-row">
+          <span class="c-badge c-badge--success"><i class="bi bi-check-circle-fill"></i> Hoạt động</span>
+          <span class="c-badge c-badge--warning"><i class="bi bi-clock-fill"></i> Chờ xử lý</span>
+          <span class="c-badge c-badge--danger"><i class="bi bi-x-circle-fill"></i> Đã hủy</span>
+          <span class="c-badge c-badge--info"><i class="bi bi-info-circle-fill"></i> Thông tin</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         7. KPI CARDS
+         ============================================================ -->
+    <section class="sg-section" id="kpi-cards">
+      <h2 class="sg-section-title"><i class="bi bi-bar-chart-line-fill"></i> 7. Card KPI</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
+        <!-- Card 1 -->
+        <div class="c-kpi-card">
+          <div class="c-kpi-icon c-kpi-icon--primary">
+            <i class="bi bi-ticket-perforated-fill"></i>
+          </div>
+          <div class="c-kpi-body">
+            <div class="c-kpi-label">Tổng vé bán hôm nay</div>
+            <div class="c-kpi-value">1,245</div>
+            <div class="c-kpi-trend c-kpi-trend--up">
+              <i class="bi bi-arrow-up-short"></i> 12.5% so với hôm qua
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="c-kpi-card">
+          <div class="c-kpi-icon c-kpi-icon--success">
+            <i class="bi bi-currency-dollar"></i>
+          </div>
+          <div class="c-kpi-body">
+            <div class="c-kpi-label">Doanh thu tháng</div>
+            <div class="c-kpi-value">856M</div>
+            <div class="c-kpi-trend c-kpi-trend--up">
+              <i class="bi bi-arrow-up-short"></i> 8.3% so với tháng trước
+            </div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="c-kpi-card">
+          <div class="c-kpi-icon c-kpi-icon--warning">
+            <i class="bi bi-bus-front-fill"></i>
+          </div>
+          <div class="c-kpi-body">
+            <div class="c-kpi-label">Chuyến xe hôm nay</div>
+            <div class="c-kpi-value">47</div>
+            <div class="c-kpi-trend c-kpi-trend--down">
+              <i class="bi bi-arrow-down-short"></i> 3.2% so với hôm qua
+            </div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="c-kpi-card">
+          <div class="c-kpi-icon c-kpi-icon--danger">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="c-kpi-body">
+            <div class="c-kpi-label">Khách hàng mới</div>
+            <div class="c-kpi-value">328</div>
+            <div class="c-kpi-trend c-kpi-trend--up">
+              <i class="bi bi-arrow-up-short"></i> 24.1% so với tháng trước
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         8. TABLE + PAGINATION
+         ============================================================ -->
+    <section class="sg-section" id="table">
+      <h2 class="sg-section-title"><i class="bi bi-table"></i> 8. Table + Phân trang</h2>
+      <div class="c-table-wrapper">
+        <table class="c-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Mã vé</th>
+              <th>Khách hàng</th>
+              <th>Tuyến</th>
+              <th>Ngày đi</th>
+              <th>Giá vé</th>
+              <th>Trạng thái</th>
+              <th style="text-align:center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>VE-20261005-001</strong></td>
+              <td>Nguyễn Văn An</td>
+              <td>Hà Nội → Hải Phòng</td>
+              <td>05/10/2026</td>
+              <td>150,000đ</td>
+              <td><span class="c-badge c-badge--success">Đã thanh toán</span></td>
+              <td class="cell-actions" style="text-align:center">
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xem"><i class="bi bi-eye"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Sửa"><i class="bi bi-pencil"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xóa" style="color:var(--clr-danger)"><i class="bi bi-trash3"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>VE-20261005-002</strong></td>
+              <td>Trần Thị Bích</td>
+              <td>TP.HCM → Đà Lạt</td>
+              <td>06/10/2026</td>
+              <td>280,000đ</td>
+              <td><span class="c-badge c-badge--warning">Chờ xử lý</span></td>
+              <td class="cell-actions" style="text-align:center">
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xem"><i class="bi bi-eye"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Sửa"><i class="bi bi-pencil"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xóa" style="color:var(--clr-danger)"><i class="bi bi-trash3"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>VE-20261005-003</strong></td>
+              <td>Lê Hoàng Cường</td>
+              <td>Đà Nẵng → Huế</td>
+              <td>05/10/2026</td>
+              <td>120,000đ</td>
+              <td><span class="c-badge c-badge--success">Đã thanh toán</span></td>
+              <td class="cell-actions" style="text-align:center">
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xem"><i class="bi bi-eye"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Sửa"><i class="bi bi-pencil"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xóa" style="color:var(--clr-danger)"><i class="bi bi-trash3"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>VE-20261005-004</strong></td>
+              <td>Phạm Minh Đức</td>
+              <td>Hà Nội → Vinh</td>
+              <td>07/10/2026</td>
+              <td>220,000đ</td>
+              <td><span class="c-badge c-badge--danger">Đã hủy</span></td>
+              <td class="cell-actions" style="text-align:center">
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xem"><i class="bi bi-eye"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Sửa"><i class="bi bi-pencil"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xóa" style="color:var(--clr-danger)"><i class="bi bi-trash3"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>VE-20261005-005</strong></td>
+              <td>Võ Thị Em</td>
+              <td>TP.HCM → Nha Trang</td>
+              <td>08/10/2026</td>
+              <td>350,000đ</td>
+              <td><span class="c-badge c-badge--info">Đã lên xe</span></td>
+              <td class="cell-actions" style="text-align:center">
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xem"><i class="bi bi-eye"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Sửa"><i class="bi bi-pencil"></i></button>
+                <button class="c-btn c-btn--ghost c-btn--icon c-btn--sm" title="Xóa" style="color:var(--clr-danger)"><i class="bi bi-trash3"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="c-pagination">
+          <div class="c-pagination-info">
+            Hiển thị
+            <select>
+              <option>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+            dòng / trang &nbsp;·&nbsp; Trang 1 / 12 (115 kết quả)
+          </div>
+          <div class="c-pagination-nav">
+            <button class="c-pagination-btn" disabled><i class="bi bi-chevron-left"></i></button>
+            <button class="c-pagination-btn is-active">1</button>
+            <button class="c-pagination-btn">2</button>
+            <button class="c-pagination-btn">3</button>
+            <span style="padding:0 4px;color:var(--clr-text-secondary)">...</span>
+            <button class="c-pagination-btn">12</button>
+            <button class="c-pagination-btn"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         9. MODAL
+         ============================================================ -->
+    <section class="sg-section" id="modal">
+      <h2 class="sg-section-title"><i class="bi bi-window-stack"></i> 9. Modal</h2>
+      <div class="sg-component-box">
+        <p style="color:var(--clr-text-secondary);margin-bottom:12px">Nhấn nút bên dưới để xem Modal demo:</p>
+        <button class="c-btn c-btn--primary" onclick="openModal()">
+          <i class="bi bi-box-arrow-up-right"></i> Mở Modal
+        </button>
+      </div>
+    </section>
+
+    <!-- MODAL -->
+    <div class="c-modal-overlay" id="demoModal">
+      <div class="c-modal">
+        <div class="c-modal-header">
+          <h3 class="c-modal-title">Thêm Nhân viên mới</h3>
+          <button class="c-modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="c-modal-body">
+          <div class="c-form-group">
+            <label class="c-label">Họ và tên <span class="required">*</span></label>
+            <input type="text" class="c-input" placeholder="Nhập họ và tên nhân viên..." />
+          </div>
+          <div class="c-form-group">
+            <label class="c-label">Email <span class="required">*</span></label>
+            <input type="email" class="c-input" placeholder="email@example.com" />
+          </div>
+          <div class="c-form-group">
+            <label class="c-label">Số điện thoại</label>
+            <input type="tel" class="c-input" placeholder="0901 234 567" />
+          </div>
+          <div class="c-form-group">
+            <label class="c-label">Chức vụ</label>
+            <select class="c-input c-select">
+              <option value="">— Chọn chức vụ —</option>
+              <option>Tài xế</option>
+              <option>Phụ xe</option>
+              <option>Nhân viên bán vé</option>
+              <option>Quản lý</option>
+            </select>
+          </div>
+          <div class="c-form-group" style="margin-bottom:0">
+            <label class="c-label">Ghi chú</label>
+            <textarea class="c-input" placeholder="Ghi chú thêm..." rows="2"></textarea>
+          </div>
+        </div>
+        <div class="c-modal-footer">
+          <button class="c-btn c-btn--ghost" onclick="closeModal()">Hủy</button>
+          <button class="c-btn c-btn--primary"><i class="bi bi-check-lg"></i> Lưu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         10. LAYOUT PREVIEW
+         ============================================================ -->
+    <section class="sg-section" id="layout">
+      <h2 class="sg-section-title"><i class="bi bi-layout-sidebar-inset"></i> 10. Layout Overview</h2>
+      <div class="sg-component-box">
+        <p style="color:var(--clr-text-secondary);margin-bottom:16px">Sơ đồ bố cục tổng thể của Web Admin:</p>
+        <div style="border:2px solid var(--clr-border);border-radius:var(--radius-md);overflow:hidden;font-size:13px;font-family:var(--font-mono);max-width:700px">
+          <!-- Header row -->
+          <div style="display:flex;height:40px;background:#fff;border-bottom:2px solid var(--clr-border)">
+            <div style="width:100px;background:var(--clr-sidebar-bg);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;border-right:2px solid var(--clr-border)">LOGO</div>
+            <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <span style="color:var(--clr-text-secondary)">🔍 Search</span>
+              <span style="color:var(--clr-text-secondary)">🔔 &nbsp; 👤</span>
+            </div>
+          </div>
+          <!-- Body row -->
+          <div style="display:flex;min-height:200px">
+            <div style="width:100px;background:var(--clr-sidebar-bg);color:rgba(255,255,255,0.7);padding:12px 8px;font-size:11px;line-height:2">
+              📊 Tổng quan<br>
+              👤 Nhân viên<br>
+              🧑 Khách hàng<br>
+              🚌 Chuyến xe<br>
+              🎫 Vé xe<br>
+              🚐 Xe<br>
+              💰 Doanh thu
+            </div>
+            <div style="flex:1;background:var(--clr-bg);padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;gap:8px">
+                <div style="flex:1;height:50px;background:#fff;border-radius:8px;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--clr-text-secondary);font-size:11px">KPI Card</div>
+                <div style="flex:1;height:50px;background:#fff;border-radius:8px;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--clr-text-secondary);font-size:11px">KPI Card</div>
+                <div style="flex:1;height:50px;background:#fff;border-radius:8px;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--clr-text-secondary);font-size:11px">KPI Card</div>
+              </div>
+              <div style="flex:1;background:#fff;border-radius:8px;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--clr-text-secondary);font-size:11px;min-height:80px">Table / Content Area</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="text-align:center;padding:24px 0;color:var(--clr-text-secondary);font-size:13px;border-top:1px solid var(--clr-border)">
+      🎨 Design System v1.0 — Hệ thống Quản lý bán vé xe khách &copy; 2026
+    </footer>
+
+  </main>
+
+  <!-- ===============================================================
+       SCRIPTS
+       =============================================================== -->
+  <script>
+    // Modal open/close
+    function openModal() {
+      document.getElementById('demoModal').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('demoModal').classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('demoModal').addEventListener('click', function (e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Close modal on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Sidebar menu active toggle (demo)
+    document.querySelectorAll('.sidebar-nav-item a').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-nav-item a').forEach(function (l) {
+          l.classList.remove('is-active');
+        });
+        this.classList.add('is-active');
+      });
+    });
+
+    // Pagination active toggle (demo)
+    document.querySelectorAll('.c-pagination-btn:not(:disabled)').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.c-pagination-btn').forEach(function (b) {
+          b.classList.remove('is-active');
+        });
+        this.classList.add('is-active');
+      });
+    });
+  </script>
+
+</body>
+
+</html>
